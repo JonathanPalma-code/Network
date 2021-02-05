@@ -1,0 +1,14 @@
+name: TestNetwork
+on: push
+
+jobs:
+  test_projects:
+    runs-on: ubunto-latest
+    steps: 
+    - uses: actions/checkout@v2
+    - name: Run Django unit tests
+      run: |
+        pip3 install --user django
+        python3 manage.py makemigrations
+        python3 manage.py migrate
+        python3 manage.py test network
