@@ -3,3 +3,94 @@ from django.db import models
 
 class User(AbstractUser):
     pass
+
+class Profile(models.Model):
+    user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='profile')
+    location = models.CharField(max_length=75)
+    birth_date = models.DateField()
+    photo = models.ImageField(blank=True, null=True, upload_to='images/')
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'user': self.user.username,
+            'location': self.location,
+            'birth date': self.birth_date.strftime('%b %#d %Y'),
+            'photo': self.photo
+        }
+
+    def __str__(self):
+        return f'{self.user.username}'
+
+class Follower(models.Model):
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='followers')
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'profile': self.profile.user.username
+        }
+
+    def __str__(self):
+        return f'{self.profile.user.username}'
+
+class Following(models.Model):
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='following')
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'profile': self.profile.user.username
+        }
+    
+    def __str__(self):
+        return f'{self.profile.user.username}'
+
+class Post(models.Model):
+    content = models.TextField(max_length=500)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    original_poster = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='post_profile')
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'content': self.content,
+            'timestamp': self.timestamp.strftime('%b %#d %Y, %#I:%M %p'),
+            'original_poster': self.original_poster.user.username
+        }
+
+    def __str__(self):
+        slice_content = slice(50)
+        return f'{self.content[slice_content]}'
+
+class Comment(models.Model):
+    content = models.CharField(max_length=100)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comment_post')
+    commenter = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='comment_owner')
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'content': self.content,
+            'timestamp': self.timestamp.strftime('%b %#d %Y, %#I:%M %p'),
+            'post': self.post.content,
+            'commenter': self.original_poster.user.username
+        }
+
+    def __str__(self):
+        return f'{self.commenter.user.username} commented {self.content} to post id nr. {self.post.id}'
+
+class Like(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='like_post')
+    like_owner = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='like_owner')
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'post': self.post.content,
+            'like_owner': self.like_owner.user.username
+        }
+
+    def __str__(self):
+        return f'{self.like_owner.user.username} liked {self.post.content}'
