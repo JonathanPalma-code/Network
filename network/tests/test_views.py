@@ -1,5 +1,4 @@
 from django.test import TransactionTestCase, Client
-from django.contrib.auth import authenticate
 from django.urls import reverse
 from network.models import User
 import json
@@ -47,6 +46,7 @@ class TestViews(TransactionTestCase):
         })
 
         self.assertTrue(response)
+        self.assertEqual(response.status_code, 200)
         
         response = self.client.post(self.login_url, {
             'username': self.user.username, 
