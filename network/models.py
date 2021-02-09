@@ -59,8 +59,8 @@ class Post(models.Model):
             'original_poster': self.original_poster.user.username
         }
 
-    def __str__(self):
-        slice_content = slice(50)
+    def __str__(self, n_characters = 50):
+        slice_content = slice(n_characters)
         return f'{self.content[slice_content]}'
 
 class Comment(models.Model):
@@ -75,11 +75,11 @@ class Comment(models.Model):
             'content': self.content,
             'timestamp': self.timestamp.strftime('%b %#d %Y, %#I:%M %p'),
             'post': self.post.content,
-            'commenter': self.original_poster.user.username
+            'commenter': self.commenter.user.username
         }
 
     def __str__(self):
-        return f'{self.commenter.user.username} commented {self.content} to post id nr. {self.post.id}'
+        return f'{self.commenter.user.username} commented "{self.content}" to post id nr. {self.post.id}'
 
 class Like(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='like_post')
@@ -93,4 +93,4 @@ class Like(models.Model):
         }
 
     def __str__(self):
-        return f'{self.like_owner.user.username} liked {self.post.content}'
+        return f'{self.like_owner.user.username} liked "{self.post.content}"'
