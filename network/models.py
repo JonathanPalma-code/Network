@@ -8,15 +8,13 @@ class Profile(models.Model):
     user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='profile')
     location = models.CharField(max_length=75)
     birth_date = models.DateField()
-    photo = models.ImageField(blank=True, null=True, upload_to='images/')
 
     def serialize(self):
         return {
             'id': self.id,
             'user': self.user.username,
             'location': self.location,
-            'birth date': self.birth_date.strftime('%b %#d %Y'),
-            'photo': self.photo
+            'birth date': self.birth_date.strftime('%b %#d %Y')
         }
 
     def __str__(self):
