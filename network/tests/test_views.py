@@ -1,7 +1,9 @@
 from django.test import TransactionTestCase, Client
+from django.contrib.auth import authenticate
 from django.urls import reverse
 from network.models import User
-import json
+
+from network.forms import AddPostForm
 
 class TestViews(TransactionTestCase):
 
@@ -19,11 +21,22 @@ class TestViews(TransactionTestCase):
         self.user.set_password('secretpass')
         self.user.save()
 
-    def test_index_GET(self):
+    def test_index_no_form_GET(self):
         response = self.client.get(self.index_url)
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'network/index.html')
+
+    def test_index_add_post_form_GET(self):
+        self.client.post(self.login_url, {
+            'username': self.user.username, 
+            'password': 'secretpass'
+        })
+        user = authenticate(username='Gandalf', password='secretpass')
+        response = self.client.get(self.index_url, {'add_post_form': AddPostForm})
+
+        self.assertTrue(user)
+        self.assertEqual(response.status_code, 200)
 
     def test_register_GET(self):
         response = self.client.get(self.register_url)
@@ -70,6 +83,7 @@ class TestViews(TransactionTestCase):
             'username': self.user.username, 
             'password': 'secret'
         })
+
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'network/login.html')
         
