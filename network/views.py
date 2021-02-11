@@ -4,12 +4,24 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User
+from .models import User, Post, Profile
 from .forms import AddPostForm
-
 
 def index(request):
     if request.user.is_authenticated:
+        user = User.objects.get(pk=request.user.id)
+        profile = Profile.objects.get(user=user)
+        if request.method == 'POST':
+            form = AddPostForm(request.POST)
+            if form.is_valid():
+                content = form.cleaned_data['content']
+                post = Post.objects.create(content=content, original_poster=profile)
+                post.save()
+                return HttpResponseRedirect(reverse('index'))
+            else:
+                return render(request, 'network/index.html', {
+                    'add_post_form': form
+                })
         return render(request, 'network/index.html', {
             'add_post_form': AddPostForm()
         })
@@ -57,6 +69,8 @@ def register(request):
         try:
             user = User.objects.create_user(username, email, password)
             user.save()
+            profile = Profile.objects.create(user=user, location='', birth_date=None)
+            profile.save()
         except IntegrityError:
             return render(request, 'network/register.html', {
                 'message': 'Username already taken.'

@@ -6,8 +6,8 @@ class User(AbstractUser):
 
 class Profile(models.Model):
     user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='profile')
-    location = models.CharField(max_length=75)
-    birth_date = models.DateField()
+    location = models.CharField(max_length=75, blank=True)
+    birth_date = models.DateField(blank=True, null=True)
 
     def serialize(self):
         return {
