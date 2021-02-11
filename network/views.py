@@ -25,7 +25,7 @@ def index(request):
         return render(request, 'network/index.html', {
             'add_post_form': AddPostForm()
         })
-    return render(request, 'network/index.html', )
+    return render(request, 'network/index.html')
 
 def login_view(request):
     if request.method == 'POST':

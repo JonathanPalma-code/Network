@@ -9,6 +9,7 @@ from network.forms import AddPostForm
 
 class TestViews(TransactionTestCase):
 
+
     @classmethod
     def setUpClass(cls):
         client = Client()
@@ -17,6 +18,13 @@ class TestViews(TransactionTestCase):
         cls.login_url = reverse('login')
         cls.logout_url = reverse('logout')
 
+        cls.user_data = {
+            'username': 'Gandalf',
+            'email': 'gandalf@email.com',
+            'password': 'secretpass',
+            'confirmation': 'secretpass'  
+        }
+
     def test_index_no_form_GET(self):
         response = self.client.get(self.index_url)
 
@@ -24,12 +32,7 @@ class TestViews(TransactionTestCase):
         self.assertTemplateUsed(response, 'network/index.html')
 
     def test_index_add_post_form_GET(self):
-        response = self.client.post(self.register_url, {
-            'username': 'Gandalf',
-            'email': 'gandalf@email.com',
-            'password': 'secretpass',
-            'confirmation': 'secretpass'
-        })
+        self.client.post(self.register_url, self.user_data)
         user = authenticate(username='Gandalf', password='secretpass')
         response = self.client.get(self.index_url, {'add_post_form': AddPostForm})
 
@@ -37,12 +40,7 @@ class TestViews(TransactionTestCase):
         self.assertTemplateUsed(response, 'network/index.html')
 
     def test_index_add_post_form_POST(self):
-        self.client.post(self.register_url, {
-            'username': 'Gandalf',
-            'email': 'gandalf@email.com',
-            'password': 'secretpass',
-            'confirmation': 'secretpass'
-        })
+        self.client.post(self.register_url, self.user_data)
         user = auth.get_user(self.client)
         response = self.client.post(self.index_url, {
             'content': 'This is my first post',
@@ -53,12 +51,7 @@ class TestViews(TransactionTestCase):
         self.assertEqual(Profile.objects.last().user.username, Post.objects.last().original_poster.user.username)
 
     def test_index_add_post_form_invalid_POST(self):
-        self.client.post(self.register_url, {
-            'username': 'Gandalf',
-            'email': 'gandalf@email.com',
-            'password': 'secretpass',
-            'confirmation': 'secretpass'
-        })
+        self.client.post(self.register_url, self.user_data)
         response = self.client.post(self.index_url, {
             'content': '',
         })
@@ -78,12 +71,7 @@ class TestViews(TransactionTestCase):
         self.assertTemplateUsed(response, 'network/login.html')
 
     def test_register_and_login_POST(self):
-        response = self.client.post(self.register_url, {
-            'username': 'Gandalf',
-            'email': 'gandalf@email.com',
-            'password': 'secretpass',
-            'confirmation': 'secretpass'
-        })
+        response = self.client.post(self.register_url, self.user_data)
 
         self.assertTrue(response)
         self.assertEqual(response.status_code, 302)
@@ -100,12 +88,7 @@ class TestViews(TransactionTestCase):
         self.assertTrue(user.is_authenticated)
 
     def test_logout(self):
-        response = self.client.post(self.register_url, {
-            'username': 'Gandalf',
-            'email': 'gandalf@email.com',
-            'password': 'secretpass',
-            'confirmation': 'secretpass'
-        })
+        response = self.client.post(self.register_url, self.user_data)
 
         self.assertEqual(response.status_code, 302)
         self.client.post(self.logout_url)
@@ -132,12 +115,7 @@ class TestViews(TransactionTestCase):
         self.assertTemplateUsed(response, 'network/register.html')
 
     def test_reguster_user_with_username_taken(self):
-        self.client.post(self.register_url, {
-            'username': 'Gandalf',
-            'email': 'gandalf@email.com',
-            'password': 'secretpass',
-            'confirmation': 'secretpass'
-        })
+        self.client.post(self.register_url, self.user_data)
         self.client.post(self.logout_url)
 
         with self.assertRaises(IntegrityError) as context:
