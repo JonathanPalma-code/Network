@@ -1,5 +1,5 @@
 from django.test import TransactionTestCase
-from network.models import User, Profile, Follower, Following, Post, Comment, Like
+from network.models import User, Profile, Follower, Following, Post, Comment
 from datetime import date, datetime
 
 class TestModels(TransactionTestCase):
@@ -56,11 +56,6 @@ class TestModels(TransactionTestCase):
             commenter=self.profile3
         )
 
-        self.like = Like.objects.create(
-            post=self.post,
-            like_owner=self.profile1
-        )
-
     def test_profile_serialize(self):
         self.assertEqual(self.profile1.serialize(), {
             'id': 1,
@@ -112,13 +107,3 @@ class TestModels(TransactionTestCase):
 
     def test_comment__str__(self):
         self.assertEqual(self.comment.__str__(), 'Frodo commented "Nice!" to post id nr. 1')
-    
-    def test_like_serialize(self):
-        self.assertEqual(self.like.serialize(), {
-            'id': 1,
-            'post': self.post.content,
-            'like_owner': self.profile1.user.username
-        })
-
-    def test_like__str__(self):
-        self.assertEqual(self.like.__str__(), 'Legolas liked "This is my first post."')

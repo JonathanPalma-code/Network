@@ -48,6 +48,7 @@ class Post(models.Model):
     content = models.TextField(max_length=500)
     timestamp = models.DateTimeField(auto_now_add=True)
     original_poster = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='post_profile')
+    likes = models.ManyToManyField(User, related_name='post_likes')
 
     def serialize(self):
         return {
@@ -78,17 +79,3 @@ class Comment(models.Model):
 
     def __str__(self):
         return f'{self.commenter.user.username} commented "{self.content}" to post id nr. {self.post.id}'
-
-class Like(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='like_post')
-    like_owner = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='like_owner')
-
-    def serialize(self):
-        return {
-            'id': self.id,
-            'post': self.post.content,
-            'like_owner': self.like_owner.user.username
-        }
-
-    def __str__(self):
-        return f'{self.like_owner.user.username} liked "{self.post.content}"'
