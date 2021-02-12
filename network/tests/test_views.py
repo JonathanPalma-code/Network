@@ -114,7 +114,7 @@ class TestViews(TransactionTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'network/register.html')
 
-    def test_reguster_user_with_username_taken(self):
+    def test_register_user_with_username_taken(self):
         self.client.post(self.register_url, self.user_data)
         self.client.post(self.logout_url)
 
@@ -130,3 +130,39 @@ class TestViews(TransactionTestCase):
 
         self.assertTrue('UNIQUE constraint failed' in str(context.exception))
         self.assertTemplateUsed(response, 'network/register.html')
+
+    def test_display_no_posts(self):
+        self.client.post(self.register_url, self.user_data)
+        response = self.client.get(self.index_url)
+
+        self.assertContains(response, 'No posts.')
+
+    def test_display_1_post(self):
+        self.client.post(self.register_url, self.user_data)
+        self.client.post(self.index_url, {
+            'content': 'First post.'
+            })
+        response = self.client.get(self.index_url)
+
+        self.assertTemplateUsed(response, 'network/index.html')
+        self.assertContains(response, 'First post.')
+        self.assertNotContains(response, 'No posts.')
+
+    def test_logout_and_display_3_post(self):
+        self.client.post(self.register_url, self.user_data)
+        self.client.post(self.index_url, {
+            'content': 'First post.'
+            })
+        self.client.post(self.index_url, {
+            'content': 'Second post.'
+            })
+        self.client.post(self.index_url, {
+            'content': 'Third post.'
+            })
+        self.client.post(self.logout_url)
+        response = self.client.get(self.index_url)
+
+        self.assertContains(response, 'First post.')
+        self.assertContains(response, 'Second post.')
+        self.assertContains(response, 'Third post.')
+        self.assertNotContains(response, 'No posts.')        

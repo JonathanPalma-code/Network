@@ -8,6 +8,7 @@ from .models import User, Post, Profile
 from .forms import AddPostForm
 
 def index(request):
+    posts = Post.objects.all().order_by('-timestamp')
     if request.user.is_authenticated:
         user = User.objects.get(pk=request.user.id)
         profile = Profile.objects.get(user=user)
@@ -23,9 +24,12 @@ def index(request):
                     'add_post_form': form
                 })
         return render(request, 'network/index.html', {
-            'add_post_form': AddPostForm()
+            'add_post_form': AddPostForm(),
+            'posts': posts
         })
-    return render(request, 'network/index.html')
+    return render(request, 'network/index.html', {
+        'posts': posts
+    })
 
 def login_view(request):
     if request.method == 'POST':

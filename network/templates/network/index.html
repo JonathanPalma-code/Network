@@ -2,6 +2,7 @@
 
 {% block body %}
 <section class="container">
+    {% if request.user.is_authenticated %}
     <form method="POST">
         {% csrf_token %}
         <div class="add-post">
@@ -11,5 +12,14 @@
             </div>
         </div>
     </form>
+    {% endif %}
+
+    {% for post in posts %}
+    <p>{{ post.original_poster }}</p>
+    <p>{{ post.timestamp }}</p>
+    <p>{{ post }}</p>
+    {% empty %}
+    <p>No posts.</p>
+    {% endfor %}
 </section>
 {% endblock %}
