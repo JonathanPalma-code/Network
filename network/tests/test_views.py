@@ -9,7 +9,6 @@ from network.forms import AddPostForm
 
 class TestViews(TransactionTestCase):
 
-
     @classmethod
     def setUpClass(cls):
         client = Client()
@@ -100,16 +99,18 @@ class TestViews(TransactionTestCase):
         self.client.post('/add_post', {
             "content": "This is my first post",
         }, content_type='application/json')
-        response = self.client.get('/posts/all_posts')
+        response = self.client.get('/all_posts')
 
         self.assertJSONEqual(str(response.status_code), 200)
 
     def test_GET_url_doesnt_exist(self):
-        response = self.client.get('/posts/string_error')
+        response = self.client.get('/url_dont_exist')
 
         self.assertJSONEqual(str(response.status_code), 400)
+
  
     # ! ---- TEST USER AUTHENTICATION ----
+
     def test_register_GET(self):
         response = self.client.get(self.register_url)
 
