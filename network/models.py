@@ -48,14 +48,18 @@ class Post(models.Model):
     content = models.TextField(max_length=500)
     timestamp = models.DateTimeField(auto_now_add=True)
     original_poster = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='post_profile')
-    likes = models.ManyToManyField(User, related_name='post_likes')
+    likes = models.ManyToManyField(User, blank=True, related_name='post_likes')
+
+    def total_likes(self):
+        return self.likes.count()
 
     def serialize(self):
         return {
             'id': self.id,
             'content': self.content,
             'timestamp': self.timestamp.strftime('%b %#d %Y, %#I:%M %p'),
-            'original_poster': self.original_poster.user.username
+            'original_poster': self.original_poster.user.username,
+            'likes': self.total_likes()
         }
 
     def __str__(self, n_characters = 50):

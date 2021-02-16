@@ -1,35 +1,80 @@
+import json
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
+from django.contrib.auth.decorators import login_required
 
 from .models import User, Post, Profile
 from .forms import AddPostForm
 
 def index(request):
-    posts = Post.objects.all().order_by('-timestamp')
+
+    # Authenticate users can add post
     if request.user.is_authenticated:
-        user = User.objects.get(pk=request.user.id)
-        profile = Profile.objects.get(user=user)
-        if request.method == 'POST':
-            form = AddPostForm(request.POST)
-            if form.is_valid():
-                content = form.cleaned_data['content']
-                post = Post.objects.create(content=content, original_poster=profile)
-                post.save()
-                return HttpResponseRedirect(reverse('index'))
-            else:
-                return render(request, 'network/index.html', {
-                    'add_post_form': form
-                })
         return render(request, 'network/index.html', {
-            'add_post_form': AddPostForm(),
-            'posts': posts
+            'add_post_form': AddPostForm()
         })
-    return render(request, 'network/index.html', {
-        'posts': posts
-    })
+    return render(request, 'network/index.html')
+
+@login_required
+def add_post(request):
+
+    # Add a post must be via POST
+    if request.method != "POST":
+        return JsonResponse({"error": "POST request required."}, status=400)
+
+    # Get data from the form?
+    data = json.loads(request.body)
+
+    likes = []
+
+    content = data.get("content", "")
+
+    # Add data to API
+    post = Post(
+        content=content,
+        original_poster=Profile.objects.get(user=request.user)
+    )
+    post.save()
+    for like in likes:
+        post.likes.add(like)
+    post.save()
+
+    return JsonResponse({"message": "Post sent successfully"}, status=201)
+
+def post(request, post_id):
+        
+    # Query for requested post
+    profile = Profile.objects.get(user=request.user)
+    try:
+        post = Post.objects.get(original_poster=profile, pk=post_id)
+    except Post.DoesNotExist:
+        return JsonResponse({"error": "Post not found."}, status=404)
+
+    # GET Data in Json format (serialize method in models.py)
+    if request.method == "GET":
+        return JsonResponse(post.serialize())
+
+    else:
+        return JsonResponse({
+            "error": "GET or PUT request required."
+        }, status=400)
+
+def nav_bar(request, nav_bar):
+
+    # Filter emails returned based on mailbox
+    if nav_bar == "all_posts":
+        posts = Post.objects.all()
+    elif nav_bar == "follower":
+        pass
+    else:
+        return JsonResponse({"error": "Invalid Link."}, status=400)
+
+    # Return emails in reverse chronologial order
+    posts = posts.order_by("-timestamp")
+    return JsonResponse([post.serialize() for post in posts], safe=False)
 
 def login_view(request):
     if request.method == 'POST':
