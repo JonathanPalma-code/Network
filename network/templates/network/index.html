@@ -3,23 +3,20 @@
 {% block body %}
 <section class="container">
     {% if request.user.is_authenticated %}
-    <form method="POST">
+    <div id='add_post'>
+        <form method="POST" id='add-post-form'>
         {% csrf_token %}
         <div class="add-post">
-            {{ add_post_form }}
-            <div class="add-post__button">
-                <input type="submit" />
+                {{ add_post_form }}
+                <div class="add-post__button">
+                    <input type="submit" />
+                </div>
             </div>
-        </div>
-    </form>
+        </form>
+    </div>
     {% endif %}
 
-    {% for post in posts %}
-    <p>{{ post.original_poster }}</p>
-    <p>{{ post.timestamp }}</p>
-    <p>{{ post }}</p>
-    {% empty %}
-    <p>No posts.</p>
-    {% endfor %}
+    <div id="all-posts">
+    </div>
 </section>
 {% endblock %}

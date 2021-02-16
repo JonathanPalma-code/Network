@@ -25,13 +25,13 @@ class TestViews(TransactionTestCase):
             'confirmation': 'secretpass'  
         }
 
-    def test_index_no_form_GET(self):
+    def test_index_no_user_GET(self):
         response = self.client.get(self.index_url)
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'network/index.html')
 
-    def test_index_add_post_form_GET(self):
+    def test_index_with_user_add_post_form_GET(self):
         self.client.post(self.register_url, self.user_data)
         user = authenticate(username='Gandalf', password='secretpass')
         response = self.client.get(self.index_url, {'add_post_form': AddPostForm})
@@ -39,25 +39,77 @@ class TestViews(TransactionTestCase):
         self.assertTrue(user.is_authenticated)
         self.assertTemplateUsed(response, 'network/index.html')
 
-    def test_index_add_post_form_POST(self):
+    def test_index_add_post_form_POST_API(self):
         self.client.post(self.register_url, self.user_data)
         user = auth.get_user(self.client)
-        response = self.client.post(self.index_url, {
-            'content': 'This is my first post',
-        })
+        response = self.client.post('/add_post', {
+            'content': 'This is my first post'
+        }, content_type='application/json')
 
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response["Location"], "/")
+        post = Post.objects.get(content='This is my first post')           
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(post.total_likes(), 0)
         self.assertEqual(Profile.objects.last().user.username, Post.objects.last().original_poster.user.username)
 
-    def test_index_add_post_form_invalid_POST(self):
+    def test_index_access_denied_POST_through_URL_GET_API(self):
         self.client.post(self.register_url, self.user_data)
-        response = self.client.post(self.index_url, {
-            'content': '',
-        })
+        response = self.client.get('/add_post', {
+            'content': 'This is my first post',
+        }, content_type='application/json')
 
-        self.assertTemplateUsed(response, 'network/index.html')
+        self.assertEqual(response.status_code, 400)
+
+    def test_GET_display_1_post_JSON(self):
+        self.client.post(self.register_url, self.user_data)
+        user = auth.get_user(self.client)
+        self.client.post('/add_post', {
+            "content": "This is my first post",
+        }, content_type='application/json')
+
+        profile = Profile.objects.get(user=user)
+        post = Post.objects.get(id=2, original_poster=profile)
+
+        response = self.client.get(f'/post/{post.id}')
         
+        self.assertTrue(response.status_code, 200)
+        self.assertJSONEqual(response.content, post.serialize())
+
+    def test_GET_JSON_response_Post_doesnt_exist(self):
+        self.client.post(self.register_url, self.user_data)
+        user = auth.get_user(self.client)
+        response = self.client.get(f'/post/20')
+
+        self.assertJSONEqual(str(response.status_code), 404)
+
+    def test_POST_display_1_post_JSON(self):
+        self.client.post(self.register_url, self.user_data)
+        user = auth.get_user(self.client)
+        self.client.post('/add_post', {
+            "content": "This is my first post",
+        }, content_type='application/json')
+        profile = Profile.objects.get(user=user)
+        post = Post.objects.get(content='This is my first post', original_poster=profile)
+        response = self.client.post(f'/post/{post.id}')
+
+        self.assertJSONNotEqual(str(response.status_code), 200)
+
+    def test_GET_display_posts(self):
+        self.client.post(self.register_url, self.user_data)
+        user = auth.get_user(self.client)
+        self.client.post('/add_post', {
+            "content": "This is my first post",
+        }, content_type='application/json')
+        response = self.client.get('/posts/all_posts')
+
+        self.assertJSONEqual(str(response.status_code), 200)
+
+    def test_GET_url_doesnt_exist(self):
+        response = self.client.get('/posts/string_error')
+
+        self.assertJSONEqual(str(response.status_code), 400)
+ 
+    # ! ---- TEST USER AUTHENTICATION ----
     def test_register_GET(self):
         response = self.client.get(self.register_url)
 
@@ -129,40 +181,4 @@ class TestViews(TransactionTestCase):
             password='secretwhite')
 
         self.assertTrue('UNIQUE constraint failed' in str(context.exception))
-        self.assertTemplateUsed(response, 'network/register.html')
-
-    def test_display_no_posts(self):
-        self.client.post(self.register_url, self.user_data)
-        response = self.client.get(self.index_url)
-
-        self.assertContains(response, 'No posts.')
-
-    def test_display_1_post(self):
-        self.client.post(self.register_url, self.user_data)
-        self.client.post(self.index_url, {
-            'content': 'First post.'
-            })
-        response = self.client.get(self.index_url)
-
-        self.assertTemplateUsed(response, 'network/index.html')
-        self.assertContains(response, 'First post.')
-        self.assertNotContains(response, 'No posts.')
-
-    def test_logout_and_display_3_post(self):
-        self.client.post(self.register_url, self.user_data)
-        self.client.post(self.index_url, {
-            'content': 'First post.'
-            })
-        self.client.post(self.index_url, {
-            'content': 'Second post.'
-            })
-        self.client.post(self.index_url, {
-            'content': 'Third post.'
-            })
-        self.client.post(self.logout_url)
-        response = self.client.get(self.index_url)
-
-        self.assertContains(response, 'First post.')
-        self.assertContains(response, 'Second post.')
-        self.assertContains(response, 'Third post.')
-        self.assertNotContains(response, 'No posts.')        
+        self.assertTemplateUsed(response, 'network/register.html')     
