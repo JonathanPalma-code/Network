@@ -7,47 +7,52 @@ document.addEventListener('DOMContentLoaded', () => {
     if (document.querySelector('#all-posts') !== null) {
         load_posts('all_posts')
     }
-    
+
 });
 
 const load_posts = (nav_bar) => {
     document.querySelector('#all-posts').innerHTML = ''
-    
-    fetch(`/posts/${nav_bar}`)
-    .then(response => response.json())
-    .then(posts => {
-        console.log(posts);
-        if (posts.length === 0) {
-            return document.querySelector('#all-posts').innerHTML = 'No posts.'
-        }
-        posts.forEach(post => {
-            display_posts(post);
-        })
-    });
+
+    fetch(`/${nav_bar}`)
+        .then(response => response.json())
+        .then(posts => {
+            console.log(posts);
+            if (posts.length === 0) {
+                return document.querySelector('#all-posts').innerHTML = 'No posts.'
+            }
+            posts.forEach(post => {
+                display_posts(post);
+            })
+        });
 }
 
 const display_posts = (post) => {
 
     const postCard = document.createElement('div');
     postCard.className = 'post-card';
-    
+
     document.getElementById('all-posts').appendChild(postCard);
-    
+
     const postUser = document.createElement('div');
     postUser.className = 'post-user';
     postUser.innerHTML = post.original_poster;
-    
+
     const postDate = document.createElement('div');
     postDate.className = 'post-date';
     postDate.innerHTML = post.timestamp;
-    
-    
+
     const postContent = document.createElement('div');
-    postContent.className = 'post-Content';
+    postContent.className = 'post-content';
     postContent.innerHTML = post.content;
-    
-    [postUser, postDate, postContent]
-    .forEach(element => postCard.appendChild(element));
+
+    const postLikes = document.createElement('div');
+    postLikes.className = 'post-likes';
+    postLikes.innerHTML = post.likes;
+
+    [postUser, postDate, postContent, postLikes]
+        .forEach(element => postCard.appendChild(element));
+
+    postCard.appendChild(postLikes);
 }
 
 const clear_form = () => {

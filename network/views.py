@@ -64,17 +64,17 @@ def post(request, post_id):
 
 def nav_bar(request, nav_bar):
 
-    # Filter emails returned based on mailbox
+    # Filter posts returned based on nav_bar
     if nav_bar == "all_posts":
         posts = Post.objects.all()
+        # Return posts in reverse chronologial order
+        posts = posts.order_by("-timestamp")
+        return JsonResponse([post.serialize() for post in posts], safe=False)
     elif nav_bar == "follower":
         pass
     else:
         return JsonResponse({"error": "Invalid Link."}, status=400)
 
-    # Return emails in reverse chronologial order
-    posts = posts.order_by("-timestamp")
-    return JsonResponse([post.serialize() for post in posts], safe=False)
 
 def login_view(request):
     if request.method == 'POST':
