@@ -23,6 +23,39 @@ class TestViews(TransactionTestCase):
             'password': 'secretpass',
             'confirmation': 'secretpass'  
         }
+        
+
+    # ! TEST DISPLAY PROFILES/PROFILE
+
+    def test_display_all_profiles_GET(self):
+        response = self.client.get('/profiles')
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_display_post_GET(self):
+        self.client.post(self.register_url, self.user_data)
+        user = auth.get_user(self.client)
+        profile = Profile.objects.get(user=user)
+        response = self.client.get(f'/profile/{profile.id}')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(response.content, profile.serialize())
+
+    def test_display_error_profile_GET(self):
+        response = self.client.get('/profile/9372')
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_error_profile_POST(self):
+        self.client.post(self.register_url, self.user_data)
+        user = auth.get_user(self.client)
+        profile = Profile.objects.get(user=user)
+        response = self.client.post(f'/profile/{profile.id}')
+
+        self.assertJSONEqual(str(response.status_code), 400)
+
+
+    # ! TEST DISPLAY POSTS/POST AND ADD POSTS
 
     def test_index_no_user_GET(self):
         response = self.client.get(self.index_url)

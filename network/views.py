@@ -56,10 +56,9 @@ def post(request, post_id):
     # GET Data in Json format (serialize method in models.py)
     if request.method == "GET":
         return JsonResponse(post.serialize())
-
     else:
         return JsonResponse({
-            "error": "GET or PUT request required."
+            "error": "GET request required."
         }, status=400)
 
 def nav_bar(request, nav_bar):
@@ -70,11 +69,24 @@ def nav_bar(request, nav_bar):
         # Return posts in reverse chronologial order
         posts = posts.order_by("-timestamp")
         return JsonResponse([post.serialize() for post in posts], safe=False)
-    elif nav_bar == "follower":
-        pass
+    elif nav_bar == "profiles":
+        profiles = Profile.objects.all()
+        return JsonResponse([profile.serialize() for profile in profiles], safe=False)
     else:
         return JsonResponse({"error": "Invalid Link."}, status=400)
 
+def profile(request, profile_id):
+    try:
+        profile = Profile.objects.get(pk=profile_id)
+    except Profile.DoesNotExist:
+        return JsonResponse({"error": "Profile not found"}, status=404)
+
+    if request.method == 'GET':
+        return JsonResponse(profile.serialize())
+    else:
+        return JsonResponse({
+            "error": "GET request required."
+        }, status=400)
 
 def login_view(request):
     if request.method == 'POST':

@@ -14,8 +14,12 @@ class Profile(models.Model):
             'id': self.id,
             'user': self.user.username,
             'location': self.location,
-            'birth date': self.birth_date.strftime('%b %#d %Y')
+            'birth date': self.dateValid()
         }
+
+    def dateValid(self):
+        if self.birth_date:
+            return self.birth_date.strftime('%b %#d %Y')
 
     def __str__(self):
         return f'{self.user.username}'

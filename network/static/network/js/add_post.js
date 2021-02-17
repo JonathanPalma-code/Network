@@ -15,12 +15,12 @@ const load_posts = (nav_bar) => {
 
     fetch(`/${nav_bar}`)
         .then(response => response.json())
-        .then(posts => {
-            console.log(posts);
-            if (posts.length === 0) {
+        .then(data => {
+            console.log(data);
+            if (data.length === 0) {
                 return document.querySelector('#all-posts').innerHTML = 'No posts.'
             }
-            posts.forEach(post => {
+            data.forEach(post => {
                 display_posts(post);
             })
         });
