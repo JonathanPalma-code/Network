@@ -75,10 +75,11 @@ def nav_bar(request, nav_bar):
     else:
         return JsonResponse({"error": "Invalid Link."}, status=400)
 
-def profile(request, profile_id):
+def profile(request, user_profile):
     try:
-        profile = Profile.objects.get(pk=profile_id)
-    except Profile.DoesNotExist:
+        user = User.objects.get(username=user_profile)
+        profile = Profile.objects.get(user=user)
+    except User.DoesNotExist or Profile.DoesNotExist:
         return JsonResponse({"error": "Profile not found"}, status=404)
 
     if request.method == 'GET':

@@ -23,7 +23,7 @@ class TestViews(TransactionTestCase):
             'password': 'secretpass',
             'confirmation': 'secretpass'  
         }
-        
+
 
     # ! TEST DISPLAY PROFILES/PROFILE
 
@@ -36,13 +36,13 @@ class TestViews(TransactionTestCase):
         self.client.post(self.register_url, self.user_data)
         user = auth.get_user(self.client)
         profile = Profile.objects.get(user=user)
-        response = self.client.get(f'/profile/{profile.id}')
+        response = self.client.get(f'/profile/{profile.user}')
 
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(response.content, profile.serialize())
 
     def test_display_error_profile_GET(self):
-        response = self.client.get('/profile/9372')
+        response = self.client.get('/profile/harry')
 
         self.assertEqual(response.status_code, 404)
 
@@ -50,7 +50,7 @@ class TestViews(TransactionTestCase):
         self.client.post(self.register_url, self.user_data)
         user = auth.get_user(self.client)
         profile = Profile.objects.get(user=user)
-        response = self.client.post(f'/profile/{profile.id}')
+        response = self.client.post(f'/profile/{profile.user}')
 
         self.assertJSONEqual(str(response.status_code), 400)
 

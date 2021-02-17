@@ -11,5 +11,5 @@ urlpatterns = [
     path("add_post", views.add_post, name="add_post"),
     path("post/<int:post_id>", views.post, name="post" ),
     path("<str:nav_bar>", views.nav_bar, name="links"),
-    path("profile/<int:profile_id>", views.profile, name='profile')
+    path("profile/<str:user_profile>", views.profile, name='profile')
 ]
