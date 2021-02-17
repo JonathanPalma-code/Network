@@ -56,25 +56,38 @@ def post(request, post_id):
     # GET Data in Json format (serialize method in models.py)
     if request.method == "GET":
         return JsonResponse(post.serialize())
-
     else:
         return JsonResponse({
-            "error": "GET or PUT request required."
+            "error": "GET request required."
         }, status=400)
 
 def nav_bar(request, nav_bar):
 
-    # Filter emails returned based on mailbox
+    # Filter posts returned based on nav_bar
     if nav_bar == "all_posts":
         posts = Post.objects.all()
-    elif nav_bar == "follower":
-        pass
+        # Return posts in reverse chronologial order
+        posts = posts.order_by("-timestamp")
+        return JsonResponse([post.serialize() for post in posts], safe=False)
+    elif nav_bar == "profiles":
+        profiles = Profile.objects.all()
+        return JsonResponse([profile.serialize() for profile in profiles], safe=False)
     else:
         return JsonResponse({"error": "Invalid Link."}, status=400)
 
-    # Return emails in reverse chronologial order
-    posts = posts.order_by("-timestamp")
-    return JsonResponse([post.serialize() for post in posts], safe=False)
+def profile(request, user_profile):
+    try:
+        user = User.objects.get(username=user_profile)
+        profile = Profile.objects.get(user=user)
+    except User.DoesNotExist or Profile.DoesNotExist:
+        return JsonResponse({"error": "Profile not found"}, status=404)
+
+    if request.method == 'GET':
+        return JsonResponse(profile.serialize())
+    else:
+        return JsonResponse({
+            "error": "GET request required."
+        }, status=400)
 
 def login_view(request):
     if request.method == 'POST':

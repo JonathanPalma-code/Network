@@ -5,8 +5,8 @@
     {% if request.user.is_authenticated %}
     <div id='add_post'>
         <form method="POST" id='add-post-form'>
-        {% csrf_token %}
-        <div class="add-post">
+            {% csrf_token %}
+            <div class="add-post">
                 {{ add_post_form }}
                 <div class="add-post__button">
                     <input type="submit" />
@@ -17,6 +17,9 @@
     {% endif %}
 
     <div id="all-posts">
+    </div>
+
+    <div id="profile-page">
     </div>
 </section>
 {% endblock %}

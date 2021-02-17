@@ -61,7 +61,7 @@ class TestModels(TransactionTestCase):
             'id': 1,
             'user': self.profile1.user.username,
             'location': self.profile1.location,
-            'birth date': self.profile1.birth_date.strftime('%b %#d %Y')
+            'birth date': 'Mar 10 1799'
         })
 
     def test_profile__str__(self):
