@@ -1,32 +1,48 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const user = document.querySelector('#profile-link').innerText;
 
     document.querySelector('#all-posts-link').addEventListener('click', () => load_posts('all_posts'));
-    document.querySelector('#profile-link').addEventListener('click', () => load_profile(user))
+
+    if (document.querySelector('#profile-link') !== null) {
+        const user = document.querySelector('#profile-link').innerText;
+        document.querySelector('#profile-link').addEventListener('click', () => load_profile(user))
+    }
 
     if (document.querySelector('#add-post-form') !== null) {
         document.querySelector('#add-post-form').onsubmit = send_post
     }
+
     if (document.querySelector('#all-posts') !== null) {
         load_posts('all_posts')
     }
-
 });
 
 const load_profile = (user) => {
 
-    document.querySelector('#all-posts').style.display = 'none';
     document.querySelector('#profile-page').style.display = 'block';
+    document.querySelector('#all-posts').style.display = 'block';
     document.querySelector('#add-post-form').style.display = 'none';
 
+    document.querySelector('#all-posts').innerHTML = '';
     document.querySelector('#profile-page').innerHTML = '';
 
     fetch(`/profile/${user}`)
-    .then(response => response.json())
-    .then(data => {
-        console.log(data);
-        display_profile(data)
-    })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            display_profile(data)
+        })
+
+    fetch(`/all_posts`)
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            data.forEach(post => {
+                console.log(post.original_poster, user)
+                if (post.original_poster === user) {
+                    display_posts(post)
+                }
+            })
+        })
 }
 
 const display_profile = (data) => {
@@ -40,14 +56,21 @@ const display_profile = (data) => {
     profileName.className = 'profile-name';
     profileName.innerHTML = data.user;
 
-    profileCard.appendChild(profileName);
+    const profileFollowers = document.createElement('p');
+    profileFollowers.className = 'profile-followers';
+    profileFollowers.innerHTML = `${data.follower.length} follower(s)`;
+
+    const profileFollowing = document.createElement('p');
+    profileFollowing.className = 'profile-following';
+    profileFollowing.innerHTML = `${data.following.length} following`;
+
+    [profileName, profileFollowers, profileFollowing]
+        .forEach(element => profileCard.appendChild(element));
 }
 
 const load_posts = (nav_bar) => {
 
-    document.querySelector('#all-posts').style.display = 'block';
     document.querySelector('#profile-page').style.display = 'none';
-    document.querySelector('#add-post-form').style.display = 'block';
 
     if (nav_bar === 'all_posts') {
         document.querySelector('#all-posts').innerHTML = '';
@@ -98,10 +121,12 @@ const display_posts = (post) => {
 }
 
 const clear_form = () => {
+
     document.querySelector('#add-content').value = '';
 }
 
 const send_post = () => {
+
     const csrftoken = getCookie('csrftoken');
     fetch('/add_post', {
         method: 'POST',
@@ -117,6 +142,7 @@ const send_post = () => {
 
 // Set up CSRF_token from Django DOCS
 function getCookie(name) {
+
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
         const cookies = document.cookie.split(';');

@@ -8,13 +8,18 @@ class Profile(models.Model):
     user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='profile')
     location = models.CharField(max_length=75, blank=True)
     birth_date = models.DateField(blank=True, null=True)
+    following = models.ManyToManyField('User', default='', related_name='user_following')
+    follower = models.ManyToManyField('User', default='', related_name='user_follower')
+
 
     def serialize(self):
         return {
             'id': self.id,
             'user': self.user.username,
             'location': self.location,
-            'birth date': self.dateValid()
+            'birth date': self.dateValid(),
+            'following': [user.username for user in self.following.all()],
+            'follower': [user.username for user in self.follower.all()]
         }
 
     def dateValid(self):
@@ -23,30 +28,6 @@ class Profile(models.Model):
 
     def __str__(self):
         return f'{self.user.username}'
-
-class Follower(models.Model):
-    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='followers')
-
-    def serialize(self):
-        return {
-            'id': self.id,
-            'profile': self.profile.user.username
-        }
-
-    def __str__(self):
-        return f'{self.profile.user.username}'
-
-class Following(models.Model):
-    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='following')
-
-    def serialize(self):
-        return {
-            'id': self.id,
-            'profile': self.profile.user.username
-        }
-    
-    def __str__(self):
-        return f'{self.profile.user.username}'
 
 class Post(models.Model):
     content = models.TextField(max_length=500)

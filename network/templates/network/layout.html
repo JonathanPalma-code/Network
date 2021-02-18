@@ -24,7 +24,7 @@
                 </li>
                 {% endif %}
                 <li class="nav-item">
-                    <a id='all-posts-link' class="nav-link">All Posts</a>
+                    <a id='all-posts-link' href="{% url 'index' %}" class="nav-link">All Posts</a>
                 </li>
                 {% if user.is_authenticated %}
                 <li class="nav-item">
