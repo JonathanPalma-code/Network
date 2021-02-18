@@ -37,7 +37,7 @@ const load_profile = (user) => {
         .then(data => {
             console.log(data);
             data.forEach(post => {
-                console.log(post.original_poster, user)
+                console.log(post.original_poster, user) 
                 if (post.original_poster === user) {
                     display_posts(post)
                 }
@@ -51,6 +51,13 @@ const display_profile = (data) => {
     profileCard.className = 'profile-card';
 
     document.getElementById('profile-page').appendChild(profileCard);
+
+    if (data.user !== document.getElementById('profile-link').innerText) {
+        const followButton = document.createElement('button');
+        followButton.className = 'btn-follow';
+        followButton.innerHTML = 'Follow';
+        document.getElementById('profile-page').appendChild(followButton);
+    }
 
     const profileName = document.createElement('h1');
     profileName.className = 'profile-name';
@@ -98,8 +105,9 @@ const display_posts = (post) => {
 
     document.getElementById('all-posts').appendChild(postCard);
 
-    const postUser = document.createElement('div');
+    const postUser = document.createElement('a');
     postUser.className = 'post-user';
+    postUser.addEventListener('click', () => load_profile(post.original_poster))
     postUser.innerHTML = post.original_poster;
 
     const postDate = document.createElement('div');
