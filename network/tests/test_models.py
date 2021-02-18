@@ -1,5 +1,5 @@
 from django.test import TransactionTestCase
-from network.models import User, Profile, Follower, Following, Post, Comment
+from network.models import User, Profile, Post, Comment
 from datetime import date, datetime
 
 class TestModels(TransactionTestCase):
@@ -40,8 +40,6 @@ class TestModels(TransactionTestCase):
             location='Middle Earth',
             birth_date=date(1990, 3, 10)
         )
-        self.follower = Follower.objects.create(profile=self.profile2)
-        self.following = Following.objects.create(profile=self.profile3)
     
         self.post = Post.objects.create(
             content='This is my first post.',
@@ -61,29 +59,13 @@ class TestModels(TransactionTestCase):
             'id': 1,
             'user': self.profile1.user.username,
             'location': self.profile1.location,
-            'birth date': 'Mar 10 1799'
+            'birth date': 'Mar 10 1799',
+            'following': [],
+            'follower': []
         })
 
     def test_profile__str__(self):
         self.assertEqual(self.profile1.__str__(), self.profile1.user.username)
-
-    def test_follower_serialize(self):
-        self.assertEqual(self.follower.serialize(), {
-            'id': 1,
-            'profile': self.profile2.user.username
-        })
-
-    def test_follower__str__(self):
-        self.assertEqual(self.follower.__str__(), self.profile2.user.username)
-
-    def test_following_serialize(self):
-        self.assertEqual(self.following.serialize(), {
-            'id': 1,
-            'profile': self.profile3.user.username
-        })
-
-    def test_following__str__(self):
-        self.assertEqual(self.following.__str__(), 'Frodo')
 
     def test_post_serialize(self):
         self.assertEqual(self.post.serialize(), {
