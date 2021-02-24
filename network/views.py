@@ -84,9 +84,28 @@ def profile(request, user_profile):
 
     if request.method == 'GET':
         return JsonResponse(profile.serialize())
+    elif request.method == 'PUT':
+        try:
+            data = json.loads(request.body)
+            print(data)
+            following_user = data.get('following', '')
+            following_user = " ".join(following_user)
+            user_followed = User.objects.get(username=following_user)
+            current_user = User.objects.get(username=request.user.username)
+        except User.DoesNotExist:
+            return JsonResponse({"error": f"User not found"}, status=404)
+        
+        follow_profile = Profile.objects.get(user=current_user)
+        following_profile = Profile.objects.get(user=user_followed)
+        following_profile.follower.add(current_user)
+        follow_profile.following.add(user_followed)
+
+        return JsonResponse({
+            "message": "Profile has been added successfully"
+        }, status=200)
     else:
         return JsonResponse({
-            "error": "GET request required."
+            "error": "GET or PUT request required."
         }, status=400)
 
 def login_view(request):
