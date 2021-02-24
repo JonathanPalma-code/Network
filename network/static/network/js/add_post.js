@@ -16,6 +16,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+const follower_user = (current_user, user) => {
+    console.log(current_user, user)
+    const csrftoken = getCookie('csrftoken');
+    fetch(`/profile/${current_user}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+            following: [user]
+        }),
+        headers: { "X-CSRFToken": csrftoken }
+    })
+
+    setTimeout(() => {
+        load_profile(user)
+    }, 500);
+    return false
+}
+
 const load_profile = (user) => {
 
     document.querySelector('#profile-page').style.display = 'block';
@@ -37,7 +54,6 @@ const load_profile = (user) => {
         .then(data => {
             console.log(data);
             data.forEach(post => {
-                console.log(post.original_poster, user)
                 if (post.original_poster === user) {
                     display_posts(post)
                 }
@@ -51,6 +67,15 @@ const display_profile = (data) => {
     profileCard.className = 'profile-card';
 
     document.getElementById('profile-page').appendChild(profileCard);
+    current_user = document.getElementById('profile-link').innerText; 
+
+    if (data.user !== current_user) {
+        const followButton = document.createElement('button');
+        followButton.className = 'btn-follow';
+        followButton.innerHTML = 'Follow';
+        followButton.onclick = () => follower_user(current_user, data.user)
+        document.getElementById('profile-page').appendChild(followButton);
+    }
 
     const profileName = document.createElement('h1');
     profileName.className = 'profile-name';
@@ -98,8 +123,9 @@ const display_posts = (post) => {
 
     document.getElementById('all-posts').appendChild(postCard);
 
-    const postUser = document.createElement('div');
+    const postUser = document.createElement('a');
     postUser.className = 'post-user';
+    postUser.addEventListener('click', () => load_profile(post.original_poster))
     postUser.innerHTML = post.original_poster;
 
     const postDate = document.createElement('div');
