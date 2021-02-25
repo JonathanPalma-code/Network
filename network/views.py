@@ -76,6 +76,7 @@ def nav_bar(request, nav_bar):
         return JsonResponse({"error": "Invalid Link."}, status=400)
 
 def profile(request, user_profile):
+    
     try:
         user = User.objects.get(username=user_profile)
         profile = Profile.objects.get(user=user)
@@ -85,20 +86,15 @@ def profile(request, user_profile):
     if request.method == 'GET':
         return JsonResponse(profile.serialize())
     elif request.method == 'PUT':
-        try:
-            data = json.loads(request.body)
-            print(data)
-            following_user = data.get('following', '')
-            following_user = " ".join(following_user)
-            user_followed = User.objects.get(username=following_user)
-            current_user = User.objects.get(username=request.user.username)
-        except User.DoesNotExist:
-            return JsonResponse({"error": f"User not found"}, status=404)
+        data = json.loads(request.body)
+        following_user = data.get('following', '')
+        following_user = " ".join(following_user)
+        user_followed = User.objects.get(username=following_user)
         
-        follow_profile = Profile.objects.get(user=current_user)
-        following_profile = Profile.objects.get(user=user_followed)
-        following_profile.follower.add(current_user)
+        follow_profile = Profile.objects.get(user=user)
         follow_profile.following.add(user_followed)
+        following_profile = Profile.objects.get(user=user_followed)
+        following_profile.follower.add(user)
 
         return JsonResponse({
             "message": "Profile has been added successfully"

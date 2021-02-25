@@ -8,7 +8,7 @@ class Profile(models.Model):
     user = models.ForeignKey('User', on_delete=models.CASCADE, related_name='profile')
     location = models.CharField(max_length=75, blank=True)
     birth_date = models.DateField(blank=True, null=True)
-    following = models.ManyToManyField('User',  default='', blank=True, related_name='user_following')
+    following = models.ManyToManyField('User', default='', blank=True, related_name='user_following')
     follower = models.ManyToManyField('User', default='', blank=True, related_name='user_follower')
 
 

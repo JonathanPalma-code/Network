@@ -24,6 +24,13 @@ class TestViews(TransactionTestCase):
             'confirmation': 'secretpass'  
         }
 
+        cls.user_data_2 = { 
+            'username': 'Legolas',
+            'email': 'legolas@email.com',
+            'password': 'elfpass',
+            'confirmation': 'elfpass'
+
+        }
 
     # ! TEST DISPLAY PROFILES/PROFILE
 
@@ -53,6 +60,23 @@ class TestViews(TransactionTestCase):
         response = self.client.post(f'/profile/{profile.user}')
 
         self.assertJSONEqual(str(response.status_code), 400)
+
+    # ! TEST FOLLOW USER
+
+    def test_follow_user(self):
+        self.client.post(self.register_url, self.user_data)
+        user_followed = auth.get_user(self.client)
+        self.client.logout()
+        self.client.post(self.register_url, self.user_data_2)
+        user = auth.get_user(self.client)
+        profile = Profile.objects.get(user=user)
+        print(profile.user)
+        response = self.client.put(f'/profile/{profile.user}', {
+            'following': [str(user_followed)]
+            }, content_type='application/json')
+
+        self.assertJSONEqual(str(response.status_code), 200)
+        self.assertJSONEqual(response.content, {"message": "Profile has been added successfully"})
 
 
     # ! TEST DISPLAY POSTS/POST AND ADD POSTS
