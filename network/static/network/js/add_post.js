@@ -17,7 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 const follower_user = (current_user, user) => {
-    console.log(current_user, user)
     const csrftoken = getCookie('csrftoken');
     fetch(`/profile/${current_user}`, {
         method: 'PUT',
