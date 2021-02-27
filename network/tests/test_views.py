@@ -70,13 +70,29 @@ class TestViews(TransactionTestCase):
         self.client.post(self.register_url, self.user_data_2)
         user = auth.get_user(self.client)
         profile = Profile.objects.get(user=user)
-        print(profile.user)
         response = self.client.put(f'/profile/{profile.user}', {
             'following': [str(user_followed)]
             }, content_type='application/json')
 
         self.assertJSONEqual(str(response.status_code), 200)
         self.assertJSONEqual(response.content, {"message": "Profile has been added successfully"})
+
+    def test_unfollow_user(self):
+        self.client.post(self.register_url, self.user_data)
+        user_followed = auth.get_user(self.client)
+        self.client.logout()
+        self.client.post(self.register_url, self.user_data_2)
+        user = auth.get_user(self.client)
+        profile = Profile.objects.get(user=user)
+        self.client.put(f'/profile/{profile.user}', {
+            'following': [str(user_followed)]
+            }, content_type='application/json')
+        response = self.client.put(f'/profile/{profile.user}', {
+            'following': [str(user_followed)]
+            }, content_type='application/json')
+
+        self.assertJSONEqual(str(response.status_code), 200)
+        self.assertJSONEqual(response.content, {"message": "Profile has been deleted successfully"})
 
 
     # ! TEST DISPLAY POSTS/POST AND ADD POSTS

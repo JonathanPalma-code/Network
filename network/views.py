@@ -88,17 +88,23 @@ def profile(request, user_profile):
     elif request.method == 'PUT':
         data = json.loads(request.body)
         following_user = data.get('following', '')
-        following_user = " ".join(following_user)
+        following_user = ", ".join(following_user)
         user_followed = User.objects.get(username=following_user)
-        
-        follow_profile = Profile.objects.get(user=user)
-        follow_profile.following.add(user_followed)
-        following_profile = Profile.objects.get(user=user_followed)
-        following_profile.follower.add(user)
+        following_profile = Profile.objects.get(user=user)
+        follower_profile = Profile.objects.get(user=user_followed)
 
-        return JsonResponse({
-            "message": "Profile has been added successfully"
-        }, status=200)
+        if following_profile.user in follower_profile.follower.all():  
+            following_profile.following.remove(user_followed)
+            follower_profile.follower.remove(user)
+            return JsonResponse({
+                "message": "Profile has been deleted successfully"
+            }, status=200)
+        else:
+            following_profile.following.add(user_followed)
+            follower_profile.follower.add(user)
+            return JsonResponse({
+                "message": "Profile has been added successfully"
+            }, status=200)
     else:
         return JsonResponse({
             "error": "GET or PUT request required."
