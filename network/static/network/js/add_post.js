@@ -71,8 +71,14 @@ const display_profile = (data) => {
     if (data.user !== current_user) {
         const followButton = document.createElement('button');
         followButton.className = 'btn-follow';
-        followButton.innerHTML = 'Follow';
-        followButton.onclick = () => follower_user(current_user, data.user)
+        if (data.follower.includes(current_user)) {
+            followButton.innerHTML = 'Unfollow';
+            followButton.onclick = () => follower_user(current_user, data.user);
+        }
+        else {
+            followButton.innerHTML = 'Follow';
+            followButton.onclick = () => follower_user(current_user, data.user);
+        }
         document.getElementById('profile-page').appendChild(followButton);
     }
 
@@ -124,7 +130,10 @@ const display_posts = (post) => {
 
     const postUser = document.createElement('a');
     postUser.className = 'post-user';
-    postUser.addEventListener('click', () => load_profile(post.original_poster))
+
+    if (document.querySelector('#profile-link')) {
+        postUser.addEventListener('click', () => load_profile(post.original_poster))
+    }
     postUser.innerHTML = post.original_poster;
 
     const postDate = document.createElement('div');
