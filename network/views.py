@@ -72,6 +72,16 @@ def nav_bar(request, nav_bar):
     elif nav_bar == "profiles":
         profiles = Profile.objects.all()
         return JsonResponse([profile.serialize() for profile in profiles], safe=False)
+    elif nav_bar == "following_posts":
+        user = User.objects.get(username=request.user.username)
+        profile = Profile.objects.get(user=user)
+        user_following = profile.following.all() 
+
+        profiles_following = Profile.objects.filter(user__in=user_following)
+
+        posts = Post.objects.filter(original_poster__in=profiles_following)
+        
+        return JsonResponse([post.serialize() for post in posts], safe=False) 
     else:
         return JsonResponse({"error": "Invalid Link."}, status=400)
 
