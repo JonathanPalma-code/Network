@@ -1,10 +1,16 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    document.querySelector('#all-posts-link').addEventListener('click', () => load_posts('all_posts'));
+    let nav_bar = 'all-posts'
+    document.querySelector('#all-posts-link').addEventListener('click', () => load_posts(nav_bar));
 
     if (document.querySelector('#profile-link') !== null) {
         const user = document.querySelector('#profile-link').innerText;
         document.querySelector('#profile-link').addEventListener('click', () => load_profile(user))
+    }
+
+    if (document.querySelector('#following_posts_link') !== null) {
+        nav_bar = 'following_posts'
+        document.querySelector('#following_posts_link').addEventListener('click', () => load_posts(nav_bar));
     }
 
     if (document.querySelector('#add-post-form') !== null) {
@@ -66,19 +72,18 @@ const display_profile = (data) => {
     profileCard.className = 'profile-card';
 
     document.getElementById('profile-page').appendChild(profileCard);
-    current_user = document.getElementById('profile-link').innerText; 
+    current_user = document.getElementById('profile-link').innerText;
 
     if (data.user !== current_user) {
         const followButton = document.createElement('button');
         followButton.className = 'btn-follow';
         if (data.follower.includes(current_user)) {
             followButton.innerHTML = 'Unfollow';
-            followButton.onclick = () => follower_user(current_user, data.user);
         }
         else {
             followButton.innerHTML = 'Follow';
-            followButton.onclick = () => follower_user(current_user, data.user);
         }
+        followButton.onclick = () => follower_user(current_user, data.user);
         document.getElementById('profile-page').appendChild(followButton);
     }
 
@@ -102,23 +107,24 @@ const load_posts = (nav_bar) => {
 
     document.querySelector('#profile-page').style.display = 'none';
 
-    if (nav_bar === 'all_posts') {
-        document.querySelector('#all-posts').innerHTML = '';
-    }
+    document.querySelector('#all-posts').innerHTML = '';
 
-    fetch(`/${nav_bar}`)
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);
-            if (nav_bar === 'all_posts') {
+    if (nav_bar === 'all_posts' || 'following_posts') {
+        if (nav_bar === 'following_posts') {
+            document.querySelector('#add-post-form').style.display = 'none';
+        }
+        fetch(`/${nav_bar}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
                 if (data.length === 0) {
                     return document.querySelector('#all-posts').innerHTML = 'No posts.'
                 }
                 data.forEach(post => {
                     display_posts(post);
                 })
-            }
-        });
+            });
+    }
 }
 
 const display_posts = (post) => {

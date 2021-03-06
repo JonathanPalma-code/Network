@@ -94,6 +94,26 @@ class TestViews(TransactionTestCase):
         self.assertJSONEqual(str(response.status_code), 200)
         self.assertJSONEqual(response.content, {"message": "Profile has been deleted successfully"})
 
+    # ! TEST Display FOLLOWING USERS POSTS
+
+    def test_following_users_posts(self):
+        self.client.post(self.register_url, self.user_data)
+        user_followed = auth.get_user(self.client)
+        profile_followed = Profile.objects.get(user=user_followed)
+        self.client.post('/add_post', {
+            "content": "This is my first post",
+        }, content_type='application/json')
+        self.client.logout()
+        self.client.post(self.register_url, self.user_data_2)
+        user = auth.get_user(self.client)
+        profile = Profile.objects.get(user=user)
+        self.client.put(f'/profile/{profile.user}', {
+            'following': [str(user_followed)]
+            }, content_type='application/json')
+        
+        response = self.client.get('/following_posts')
+
+        self.assertJSONEqual(str(response.status_code), 200)
 
     # ! TEST DISPLAY POSTS/POST AND ADD POSTS
 
