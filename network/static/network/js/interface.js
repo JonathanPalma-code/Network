@@ -44,7 +44,7 @@ const load_profile = (user) => {
     document.querySelector('#all-posts').style.display = 'block';
     document.querySelector('#add-post-form').style.display = 'none';
 
-    document.querySelector('#all-posts').innerHTML = '';
+    elementList = document.querySelector('#all-posts');
     document.querySelector('#profile-page').innerHTML = '';
 
     fetch(`/profile/${user}`)
@@ -58,10 +58,17 @@ const load_profile = (user) => {
         .then(response => response.json())
         .then(data => {
             console.log(data);
+            let postData = [];
             data.forEach(post => {
                 if (post.original_poster === user) {
-                    display_posts(post)
+                    postData.push(post);
                 }
+
+                const current_page = 1;
+                const rows = 2;
+
+                display_list_posts(postData, elementList, rows, current_page);
+                display_pagination(postData, elementPage, rows, current_page);
             })
         })
 }
@@ -135,7 +142,7 @@ const load_posts = (nav_bar) => {
 const display_pagination = (data_list, wrapper, rows_per_page, current_page) => {
     wrapper.innerHTML = "";
     const page_count = Math.ceil(data_list.length / rows_per_page);
-    
+
     for (let i = 1; i < page_count + 1; i++) {
         paginationBtn(i, data_list, current_page, rows_per_page);
     }
@@ -147,7 +154,7 @@ const paginationBtn = (page, data_list, current_page, rows_per_page) => {
     const link = document.createElement("a");
     link.className = "page-link";
     link.innerHTML = page;
-    
+
     paginationButton.appendChild(link)
     document.querySelector(".pagination").appendChild(paginationButton)
 
@@ -175,10 +182,10 @@ const display_list_posts = (data_list, wrapper, rows_per_page, page) => {
     const start = rows_per_page * page;
     const end = start + rows_per_page
     const paginatedItems = data_list.slice(start, end)
-    
+
     for (let i = 0; i < paginatedItems.length; i++) {
-       let post = paginatedItems[i];
-       display_posts(post)
+        let post = paginatedItems[i];
+        display_posts(post)
     }
 }
 
