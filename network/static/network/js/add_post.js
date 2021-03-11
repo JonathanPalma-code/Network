@@ -107,7 +107,8 @@ const load_posts = (nav_bar) => {
 
     document.querySelector('#profile-page').style.display = 'none';
 
-    document.querySelector('#all-posts').innerHTML = '';
+    elementList = document.querySelector('#all-posts');
+    elementPage = document.querySelector('.pagination');
 
     if (nav_bar === 'all_posts' || 'following_posts') {
         if (nav_bar === 'following_posts') {
@@ -120,10 +121,64 @@ const load_posts = (nav_bar) => {
                 if (data.length === 0) {
                     return document.querySelector('#all-posts').innerHTML = 'No posts.'
                 }
-                data.forEach(post => {
-                    display_posts(post);
-                })
+
+                // Specify the starting page and rows of posts per page
+                const current_page = 1;
+                const rows = 2;
+
+                display_list_posts(data, elementList, rows, current_page);
+                display_pagination(data, elementPage, rows, current_page);
             });
+    }
+}
+
+const display_pagination = (data_list, wrapper, rows_per_page, current_page) => {
+    wrapper.innerHTML = "";
+    const page_count = Math.ceil(data_list.length / rows_per_page);
+    
+    for (let i = 1; i < page_count + 1; i++) {
+        paginationBtn(i, data_list, current_page, rows_per_page);
+    }
+}
+
+const paginationBtn = (page, data_list, current_page, rows_per_page) => {
+    const paginationButton = document.createElement("li");
+    paginationButton.classList.add("page-item");
+    const link = document.createElement("a");
+    link.className = "page-link";
+    link.innerHTML = page;
+    
+    paginationButton.appendChild(link)
+    document.querySelector(".pagination").appendChild(paginationButton)
+
+    listElement = document.querySelector('#all-posts');
+
+    if (current_page === page) paginationButton.classList.add('active');
+
+
+
+    link.addEventListener('click', () => {
+        current_page = page;
+        display_list_posts(data_list, listElement, rows_per_page, current_page);
+        const current_btn = document.querySelector('.page-item.active');
+        current_btn.classList.remove('active');
+
+        paginationButton.classList.add('active');
+    })
+
+    return paginationButton;
+}
+
+const display_list_posts = (data_list, wrapper, rows_per_page, page) => {
+    wrapper.innerHTML = "";
+    page--;
+    const start = rows_per_page * page;
+    const end = start + rows_per_page
+    const paginatedItems = data_list.slice(start, end)
+    
+    for (let i = 0; i < paginatedItems.length; i++) {
+       let post = paginatedItems[i];
+       display_posts(post)
     }
 }
 
@@ -156,8 +211,6 @@ const display_posts = (post) => {
 
     [postUser, postDate, postContent, postLikes]
         .forEach(element => postCard.appendChild(element));
-
-    postCard.appendChild(postLikes);
 }
 
 const clear_form = () => {
