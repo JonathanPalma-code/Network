@@ -146,7 +146,8 @@ const load_pagination = (data, wrapper, rows_per_page, current_page) => {
     linkNext.innerHTML = ">>";
 
     const paginationPrevious = document.createElement("li");
-    paginationPrevious.className = "page-item previous disabled";
+    paginationPrevious.className = "page-item previous";
+    paginationPrevious.style.display = "none";
     const linkPrevious = document.createElement("a");
     linkPrevious.className = "page-link";
     linkPrevious.innerHTML = "<<";
@@ -164,8 +165,7 @@ const load_pagination = (data, wrapper, rows_per_page, current_page) => {
 
     document.querySelector(".pagination").appendChild(paginationNext);
 
-
-    if (current_page === page_count) paginationNext.classList.add("disabled");
+    if (current_page === page_count) paginationNext.style.display = "none";
 
     // ! Display posts per page clicking "next" button
     linkNext.addEventListener("click", () => {
@@ -182,12 +182,12 @@ const load_pagination = (data, wrapper, rows_per_page, current_page) => {
             });
 
             (current_page === page_count) ?
-                paginationNext.classList.add("disabled") :
-                paginationNext.classList.remove("disabled");
+                paginationNext.style.display = "none" :
+                paginationNext.style.display = "block";
 
             (current_page === 1) ?
-                paginationPrevious.classList.add("disabled") :
-                paginationPrevious.classList.remove("disabled");
+                paginationPrevious.style.display = "none" :
+                paginationPrevious.style.display = "block";
         }
     })
 
@@ -206,12 +206,12 @@ const load_pagination = (data, wrapper, rows_per_page, current_page) => {
             });
 
             (current_page === 1) ?
-                paginationPrevious.classList.add("disabled") :
-                paginationPrevious.classList.remove("disabled");
+                paginationPrevious.style.display = "none" :
+                paginationPrevious.style.display = "block" ;
 
             (current_page === page_count) ?
-                paginationNext.classList.add("disabled") :
-                paginationNext.classList.remove("disabled");
+                paginationNext.style.display = "none" :
+                paginationNext.style.display = "block";
         }
     })
 }
@@ -243,15 +243,15 @@ const display_pagination = (page, data, current_page, rows_per_page) => {
 
         // ! Disable or able "previous" or "next" button on clicking the number's page
         if (paginationButton.innerText === "1") {
-            paginationPrevious.classList.add("disabled");
+            paginationPrevious.style.display = "none";
         } else {
-            paginationPrevious.classList.remove('disabled');
+            paginationPrevious.style.display = "block";
         }
 
         if (paginationButton.innerText === page_count.toString()) {
-            paginationNext.classList.add("disabled");
+            paginationNext.style.display = "none";
         } else {
-            paginationNext.classList.remove('disabled');
+            paginationNext.style.display = "block";
         }
     })
 
