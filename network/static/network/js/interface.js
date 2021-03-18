@@ -165,8 +165,7 @@ const load_pagination = (data, wrapper, rows_per_page, current_page) => {
 
     document.querySelector(".pagination").appendChild(paginationNext);
 
-
-    if (current_page === page_count) paginationNext.classList.add("disabled");
+    if (current_page === page_count) paginationNext.style.display = "none";
 
     // ! Display posts per page clicking "next" button
     linkNext.addEventListener("click", () => {
