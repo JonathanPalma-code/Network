@@ -32,6 +32,25 @@ class TestViews(TransactionTestCase):
 
         }
 
+    # ! TEST UPDATE POST
+
+    def test_update_post(self):
+        self.client.post(self.register_url, self.user_data)
+        user = auth.get_user(self.client)
+        response = self.client.post('/add_post', {
+            'content': 'This is my first post'
+        }, content_type='application/json')
+
+        profile = Profile.objects.get(user=user)
+        post = Post.objects.get(original_poster=profile, content='This is my first post') 
+
+        response = self.client.put(f'/post/{post.id}', {
+            'content': 'This is my second post'
+        }, content_type='application/json')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(response.content, {"message": "Post updated successfully"})
+
     # ! TEST DISPLAY PROFILES/PROFILE
 
     def test_display_all_profiles_GET(self):

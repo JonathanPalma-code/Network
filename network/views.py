@@ -63,7 +63,7 @@ def post(request, post_id):
         content = data.get("content", "")
         post.content = content
         post.save()
-        return JsonResponse({"message": "Post updated successfully"}, status=201)
+        return JsonResponse({"message": "Post updated successfully"}, status=200)
     
     else:
         return JsonResponse({
