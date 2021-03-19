@@ -56,9 +56,18 @@ def post(request, post_id):
     # GET Data in Json format (serialize method in models.py)
     if request.method == "GET":
         return JsonResponse(post.serialize())
+ 
+    # ADD A PUT REQUEST FOR POST CONTENT
+    if request.method == "PUT":
+        data = json.loads(request.body)
+        content = data.get("content", "")
+        post.content = content
+        post.save()
+        return JsonResponse({"message": "Post updated successfully"}, status=201)
+    
     else:
         return JsonResponse({
-            "error": "GET request required."
+            "error": "GET or PUT request required."
         }, status=400)
 
 def nav_bar(request, nav_bar):
