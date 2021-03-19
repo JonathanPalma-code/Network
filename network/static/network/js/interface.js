@@ -159,6 +159,7 @@ const load_pagination = (data, wrapper, rows_per_page, current_page) => {
 
     document.querySelector(".pagination").appendChild(paginationPrevious);
 
+    // ! Display posts per page clicking (1, 2, 3 ... buttons)
     for (let i = 1; i <= page_count; i++) {
         display_pagination(i, data, current_page, rows_per_page);
     }
@@ -207,7 +208,7 @@ const load_pagination = (data, wrapper, rows_per_page, current_page) => {
 
             (current_page === 1) ?
                 paginationPrevious.style.display = "none" :
-                paginationPrevious.style.display = "block" ;
+                paginationPrevious.style.display = "block";
 
             (current_page === page_count) ?
                 paginationNext.style.display = "none" :
@@ -291,6 +292,7 @@ const display_posts = (post) => {
     postDate.innerHTML = post.timestamp;
 
     const postContent = document.createElement('div');
+    postContent.id = post.id;
     postContent.className = 'post-content';
     postContent.innerHTML = post.content;
 
@@ -300,6 +302,44 @@ const display_posts = (post) => {
 
     [postUser, postDate, postContent, postLikes]
         .forEach(element => postCard.appendChild(element));
+
+    if (document.querySelector("#profile-link").innerText === post.original_poster) {
+        const editLink = document.createElement('a');
+        editLink.className = 'edit-link';
+        editLink.innerHTML = 'Edit';
+        postCard.appendChild(editLink);
+        editLink.onclick = () => display_edit(post, postContent, postCard, editLink);
+    }
+
+}
+
+const display_edit = (post, postContent, postCard, editLink) => {
+    const editTextArea = document.createElement("textarea");
+    editTextArea.innerHTML = post.content
+    postCard.replaceChild(editTextArea, postContent);
+    editLink.innerHTML = "Save";
+    editLink.onclick = () => {
+        let newPostContent = { id: post.id, content: editTextArea.value };
+        load_edit(newPostContent, post);
+        postCard.replaceChild(postContent, editTextArea);
+        editLink.innerHTML = "Edit";
+        postContent.innerHTML = newPostContent.content;
+
+        // Update post cycle
+        editLink.onclick = () => display_edit(newPostContent, postContent, postCard, editLink)
+    }
+}
+
+const load_edit = (newPostContent, post) => {
+    const csrftoken = getCookie('csrftoken');
+    fetch(`/post/${post.id}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+            content: newPostContent.content
+        }),
+        headers: { "X-CSRFToken": csrftoken }
+    })
+        .then(response => response.json())
 }
 
 const clear_form = () => {
