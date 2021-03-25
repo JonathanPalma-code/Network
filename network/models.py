@@ -44,7 +44,7 @@ class Post(models.Model):
             'content': self.content,
             'timestamp': self.timestamp.strftime('%b %#d %Y, %#I:%M %p'),
             'original_poster': self.original_poster.user.username,
-            'likes': self.total_likes()
+            'likes': [user.username for user in self.likes.all()]
         }
 
     def __str__(self, n_characters = 50):

@@ -274,6 +274,8 @@ const display_list_posts = (data, wrapper, rows_per_page, page) => {
 
 const display_posts = (post) => {
 
+    const current_user = document.querySelector('#profile-link');
+
     const postCard = document.createElement('div');
     postCard.className = 'post-card';
 
@@ -282,7 +284,7 @@ const display_posts = (post) => {
     const postUser = document.createElement('a');
     postUser.className = 'post-user';
 
-    if (document.querySelector('#profile-link')) {
+    if (current_user) {
         postUser.addEventListener('click', () => load_profile(post.original_poster))
     }
     postUser.innerHTML = post.original_poster;
@@ -298,11 +300,25 @@ const display_posts = (post) => {
 
     const postLikes = document.createElement('div');
     postLikes.className = 'post-likes';
-    postLikes.innerHTML = post.likes;
+    postLikes.innerHTML = post.likes.length;
 
-    [postUser, postDate, postContent, postLikes]
-        .forEach(element => postCard.appendChild(element));
+    // ! ADD LIKE OR UNLIKE AND LIMITATE LIKE TO 1
 
+    const likePost = document.createElement('button');
+    likePost.className = "like";
+
+    if (post.likes.includes(current_user.innerText)) {
+        likePost.innerHTML = "Unlike";
+    } else {
+        likePost.innerHTML = "Like";
+    }
+    likePost.onclick = () => {
+        load_like(post, postLikes, likePost, current_user);
+    }
+    
+    [postUser, postDate, postContent, postLikes, likePost]
+    .forEach(element => postCard.appendChild(element));
+    
     if (document.querySelector("#profile-link").innerText === post.original_poster) {
         const editLink = document.createElement('a');
         editLink.className = 'edit-link';
@@ -310,7 +326,31 @@ const display_posts = (post) => {
         postCard.appendChild(editLink);
         editLink.onclick = () => display_edit(post, postContent, postCard, editLink);
     }
+}
 
+const load_like = (post, postLikes, likePost, current_user) => {
+    const csrftoken = getCookie('csrftoken');
+    fetch(`/post/${post.id}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+            likes: [post.original_poster.id]
+        }),
+        headers: { "X-CSRFToken": csrftoken }
+    })
+    .then(response => response.json())
+    .then(data => {
+        display_likes(data, postLikes, likePost, current_user)
+    })
+}
+
+const display_likes = (post, postLikes, likePost, current_user) => {
+    if (post.likes.includes(current_user.innerText)) {
+        likePost.innerHTML = "Unlike";
+    } else {
+        likePost.innerHTML = "Like";
+    }
+    console.log(post)
+    postLikes.innerHTML = post.likes.length;
 }
 
 const display_edit = (post, postContent, postCard, editLink) => {
@@ -340,6 +380,8 @@ const load_edit = (newPostContent, post) => {
         headers: { "X-CSRFToken": csrftoken }
     })
         .then(response => response.json())
+        .then(result => console.log(result));
+
 }
 
 const clear_form = () => {
