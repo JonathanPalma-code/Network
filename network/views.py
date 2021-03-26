@@ -47,9 +47,9 @@ def add_post(request):
 def post(request, post_id):
         
     # Query for requested post
-    profile = Profile.objects.get(user=request.user)
+    # profile = Profile.objects.get(user=request.user)
     try:
-        post = Post.objects.get(original_poster=profile, pk=post_id)
+        post = Post.objects.get(pk=post_id)
     except Post.DoesNotExist:
         return JsonResponse({"error": "Post not found."}, status=404)
 
@@ -57,13 +57,27 @@ def post(request, post_id):
     if request.method == "GET":
         return JsonResponse(post.serialize())
  
-    # ADD A PUT REQUEST FOR POST CONTENT
+    # ADD A PUT REQUEST FOR POST CONTENT OR ADD LIKE
     if request.method == "PUT":
         data = json.loads(request.body)
-        content = data.get("content", "")
-        post.content = content
-        post.save()
-        return JsonResponse({"message": "Post updated successfully"}, status=200)
+
+        if "content" in data:
+            content = data.get("content", "")
+            post.content = content
+            post.save() 
+            return JsonResponse({"message": "Post updated successfully"}, status=200)
+        else:
+            pass
+            if "likes" in data and request.user in post.likes.all():
+                post.likes.remove(request.user)
+                post.save()
+                return JsonResponse(post.serialize(), status=200)
+                # return JsonResponse({"message": f"Unliked: {post.content}"}, status=200)
+            else:
+                post.likes.add(request.user)
+                post.save()
+                return JsonResponse(post.serialize(), status=200)
+                # return JsonResponse({"message": f"Liked: {post.content}"}, status=200)
     
     else:
         return JsonResponse({

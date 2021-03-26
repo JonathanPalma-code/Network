@@ -1,16 +1,22 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     let nav_bar = 'all-posts'
-    document.querySelector('#all-posts-link').addEventListener('click', () => load_posts(nav_bar));
+    document.querySelector('#all-posts-link').addEventListener('click', () => {
+        load_posts(nav_bar);
+    })
 
     if (document.querySelector('#profile-link') !== null) {
         const user = document.querySelector('#profile-link').innerText;
-        document.querySelector('#profile-link').addEventListener('click', () => load_profile(user))
+        document.querySelector('#profile-link').addEventListener('click', () => {
+            load_profile(user);
+        })
     }
 
     if (document.querySelector('#following_posts_link') !== null) {
         nav_bar = 'following_posts'
-        document.querySelector('#following_posts_link').addEventListener('click', () => load_posts(nav_bar));
+        document.querySelector('#following_posts_link').addEventListener('click', () => {
+            load_posts(nav_bar);
+        })
     }
 
     if (document.querySelector('#add-post-form') !== null) {
@@ -44,8 +50,6 @@ const load_profile = (user) => {
     document.querySelector('#all-posts').style.display = 'block';
     document.querySelector('#add-post-form').style.display = 'none';
 
-    elementList = document.querySelector('#all-posts');
-    document.querySelector('#profile-page').innerHTML = '';
 
     fetch(`/profile/${user}`)
         .then(response => response.json())
@@ -57,23 +61,23 @@ const load_profile = (user) => {
     fetch(`/all_posts`)
         .then(response => response.json())
         .then(data => {
-            console.log(data);
+            // console.log(data.sort());
             let postData = [];
             data.forEach(post => {
                 if (post.original_poster === user)
                     postData.push(post);
-
-                const current_page = 1;
-                const rows = 2;
-
-                display_list_posts(postData, elementList, rows, current_page);
-                load_pagination(postData, elementPage, rows, current_page);
             })
+            const current_page = 1;
+            const rows = 2;
+
+            elementList = document.querySelector('#all-posts');
+            display_list_posts(postData, elementList, rows, current_page);
+            load_pagination(postData, elementPage, rows, current_page);
         })
 }
 
 const display_profile = (data) => {
-
+    document.querySelector('#profile-page').innerHTML = '';
     const profileCard = document.createElement('div');
     profileCard.className = 'profile-card';
 
@@ -268,11 +272,17 @@ const display_list_posts = (data, wrapper, rows_per_page, page) => {
 
     for (let i = 0; i < paginatedItems.length; i++) {
         let post = paginatedItems[i];
-        display_posts(post)
+        fetch(`/post/${post.id}`)
+            .then(response => response.json())
+            .then(data => {
+                display_posts(data)
+            })
     }
 }
 
 const display_posts = (post) => {
+
+    const current_user = document.querySelector('#profile-link');
 
     const postCard = document.createElement('div');
     postCard.className = 'post-card';
@@ -282,7 +292,7 @@ const display_posts = (post) => {
     const postUser = document.createElement('a');
     postUser.className = 'post-user';
 
-    if (document.querySelector('#profile-link')) {
+    if (current_user) {
         postUser.addEventListener('click', () => load_profile(post.original_poster))
     }
     postUser.innerHTML = post.original_poster;
@@ -298,19 +308,71 @@ const display_posts = (post) => {
 
     const postLikes = document.createElement('div');
     postLikes.className = 'post-likes';
-    postLikes.innerHTML = post.likes;
+    if (post.likes.length > 0)
+        postLikes.innerHTML = post.likes.length;
 
-    [postUser, postDate, postContent, postLikes]
+    // ! ADD LIKE OR UNLIKE AND LIMITATE LIKE TO 1
+
+    const likePost = document.createElement('button');
+
+    if (current_user) {
+        likePost.className = "like";
+
+        if (post.likes.includes(current_user.innerText)) {
+            likePost.innerHTML = "Unlike";
+        } else {
+            likePost.innerHTML = "Like";
+        }
+        likePost.onclick = () => {
+            load_like(post, postLikes, likePost, current_user);
+        }
+    } else
+        likePost.style.display = 'none';
+
+    [postUser, postDate, postContent, postLikes, likePost]
         .forEach(element => postCard.appendChild(element));
 
-    if (document.querySelector("#profile-link").innerText === post.original_poster) {
-        const editLink = document.createElement('a');
-        editLink.className = 'edit-link';
-        editLink.innerHTML = 'Edit';
-        postCard.appendChild(editLink);
-        editLink.onclick = () => display_edit(post, postContent, postCard, editLink);
+    if (current_user) {
+        if (document.querySelector("#profile-link").innerText === post.original_poster) {
+            const editLink = document.createElement('a');
+            editLink.className = 'edit-link';
+            editLink.innerHTML = 'Edit';
+            postCard.appendChild(editLink);
+            editLink.onclick = () => display_edit(post, postContent, postCard, editLink);
+        }
+
     }
 
+}
+
+const load_like = (post, postLikes, likePost, current_user) => {
+    const csrftoken = getCookie('csrftoken');
+    fetch(`/post/${post.id}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+            likes: [post.original_poster.id]
+        }),
+        headers: { "X-CSRFToken": csrftoken }
+    })
+        .then(response => response.json())
+        .then(data => {
+            display_likes(data, postLikes, likePost, current_user)
+        })
+}
+
+const display_likes = (post, postLikes, likePost, current_user) => {
+    if (post.likes.includes(current_user.innerText)) {
+        likePost.innerHTML = "Unlike";
+    } else {
+        likePost.innerHTML = "Like";
+    }
+    console.log(post)
+    if (post.likes.length > 0) {
+        postLikes.style.display = 'block';
+        postLikes.innerHTML = post.likes.length;
+    }
+    else
+        postLikes.style.display = 'none';
 }
 
 const display_edit = (post, postContent, postCard, editLink) => {
@@ -340,6 +402,8 @@ const load_edit = (newPostContent, post) => {
         headers: { "X-CSRFToken": csrftoken }
     })
         .then(response => response.json())
+        .then(result => console.log(result));
+
 }
 
 const clear_form = () => {
