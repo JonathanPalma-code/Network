@@ -70,7 +70,7 @@ class TestModels(TransactionTestCase):
     def test_post_serialize(self):
         self.assertEqual(self.post.serialize(), {
             'id': 1,
-            'likes': 0,
+            'likes': [],
             'content': 'This is my first post.',
             'timestamp': self.post.timestamp.strftime('%b %#d %Y, %#I:%M %p'),
             'original_poster': self.post.original_poster.user.username
