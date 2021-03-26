@@ -57,18 +57,19 @@ const load_profile = (user) => {
     fetch(`/all_posts`)
         .then(response => response.json())
         .then(data => {
-            console.log(data);
             let postData = [];
             data.forEach(post => {
                 if (post.original_poster === user)
                     postData.push(post);
-
-                const current_page = 1;
-                const rows = 2;
-
-                display_list_posts(postData, elementList, rows, current_page);
-                load_pagination(postData, elementPage, rows, current_page);
+                // console.log(post);
+                // console.log(postData)
             })
+
+            const current_page = 1;
+            const rows = 2;
+
+            display_list_posts(postData, elementList, rows, current_page);
+            load_pagination(postData, elementPage, rows, current_page);
         })
 }
 
@@ -268,7 +269,11 @@ const display_list_posts = (data, wrapper, rows_per_page, page) => {
 
     for (let i = 0; i < paginatedItems.length; i++) {
         let post = paginatedItems[i];
-        display_posts(post)
+        fetch(`/post/${post.id}`)
+            .then(response => response.json())
+            .then(element => {
+                display_posts(element)
+            })
     }
 }
 
@@ -315,10 +320,10 @@ const display_posts = (post) => {
     likePost.onclick = () => {
         load_like(post, postLikes, likePost, current_user);
     }
-    
+
     [postUser, postDate, postContent, postLikes, likePost]
-    .forEach(element => postCard.appendChild(element));
-    
+        .forEach(element => postCard.appendChild(element));
+
     if (document.querySelector("#profile-link").innerText === post.original_poster) {
         const editLink = document.createElement('a');
         editLink.className = 'edit-link';
@@ -337,10 +342,10 @@ const load_like = (post, postLikes, likePost, current_user) => {
         }),
         headers: { "X-CSRFToken": csrftoken }
     })
-    .then(response => response.json())
-    .then(data => {
-        display_likes(data, postLikes, likePost, current_user)
-    })
+        .then(response => response.json())
+        .then(data => {
+            display_likes(data, postLikes, likePost, current_user)
+        })
 }
 
 const display_likes = (post, postLikes, likePost, current_user) => {
