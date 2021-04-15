@@ -270,14 +270,9 @@ const display_list_posts = (data, wrapper, rows_per_page, page) => {
     const end = start + rows_per_page
     const paginatedItems = data.slice(start, end)
 
-    for (let i = 0; i < paginatedItems.length; i++) {
-        let post = paginatedItems[i];
-        fetch(`/post/${post.id}`)
-            .then(response => response.json())
-            .then(data => {
-                display_posts(data)
-            })
-    }
+    paginatedItems.forEach(post => {
+        display_posts(post)
+    })
 }
 
 const display_posts = (post) => {
@@ -305,27 +300,35 @@ const display_posts = (post) => {
     postContent.id = post.id;
     postContent.className = 'post-content';
     postContent.innerHTML = post.content;
-
+    
     const postLikes = document.createElement('div');
     postLikes.className = 'post-likes';
-    if (post.likes.length > 0)
-        postLikes.innerHTML = post.likes.length;
-
+    
     // ! ADD LIKE OR UNLIKE AND LIMITATE LIKE TO 1
-
+    
     const likePost = document.createElement('button');
-
+    
+    const editLink = document.createElement('a');
     if (current_user) {
         likePost.className = "like";
-
-        if (post.likes.includes(current_user.innerText)) {
-            likePost.innerHTML = "Unlike";
-        } else {
-            likePost.innerHTML = "Like";
-        }
-        likePost.onclick = () => {
-            load_like(post, postLikes, likePost, current_user);
-        }
+        
+        fetch(`/post/${post.id}`)
+        .then(response => response.json())
+        .then(data => {
+                postContent.innerHTML = data.content;
+                if (data.likes.length > 0)
+                    postLikes.innerHTML = data.likes.length;
+                if (data.likes.includes(current_user.innerText)) {
+                    likePost.innerHTML = "Unlike";
+                } else {
+                    likePost.innerHTML = "Like";
+                }
+                likePost.onclick = () => {
+                    load_like(data, postLikes, likePost, current_user);
+                }
+                editLink.onclick = () => display_edit(data, postContent, postCard, editLink);
+                
+            })
     } else
         likePost.style.display = 'none';
 
@@ -334,11 +337,9 @@ const display_posts = (post) => {
 
     if (current_user) {
         if (document.querySelector("#profile-link").innerText === post.original_poster) {
-            const editLink = document.createElement('a');
             editLink.className = 'edit-link';
             editLink.innerHTML = 'Edit';
             postCard.appendChild(editLink);
-            editLink.onclick = () => display_edit(post, postContent, postCard, editLink);
         }
 
     }

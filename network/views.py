@@ -67,7 +67,6 @@ def post(request, post_id):
             post.save() 
             return JsonResponse({"message": "Post updated successfully"}, status=200)
         else:
-            pass
             if "likes" in data and request.user in post.likes.all():
                 post.likes.remove(request.user)
                 post.save()
