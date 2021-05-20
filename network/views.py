@@ -71,12 +71,10 @@ def post(request, post_id):
                 post.likes.remove(request.user)
                 post.save()
                 return JsonResponse(post.serialize(), status=200)
-                # return JsonResponse({"message": f"Unliked: {post.content}"}, status=200)
             else:
                 post.likes.add(request.user)
                 post.save()
                 return JsonResponse(post.serialize(), status=200)
-                # return JsonResponse({"message": f"Liked: {post.content}"}, status=200)
     
     else:
         return JsonResponse({
