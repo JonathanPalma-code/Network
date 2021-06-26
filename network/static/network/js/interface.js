@@ -131,7 +131,7 @@ const load_posts = (nav_bar) => {
 
                 // Specify the starting page and rows of posts per page
                 const current_page = 1;
-                const rows = 2;
+                const rows = 4;
 
                 display_list_posts(data, elementList, rows, current_page);
                 load_pagination(data, elementPage, rows, current_page);
@@ -319,9 +319,10 @@ const display_posts = (post) => {
                 if (data.likes.length > 0)
                     postLikes.innerHTML = data.likes.length;
                 if (data.likes.includes(current_user.innerText)) {
-                    likePost.innerHTML = "Unlike";
+                    likePost.innerHTML = '<i class="fas fa-thumbs-up"></i>';
                 } else {
-                    likePost.innerHTML = "Like";
+                    likePost.innerHTML = '<i class="far fa-thumbs-up"></i>';
+
                 }
                 likePost.onclick = () => {
                     load_like(data, postLikes, likePost, current_user);
@@ -338,7 +339,7 @@ const display_posts = (post) => {
     if (current_user) {
         if (document.querySelector("#profile-link").innerText === post.original_poster) {
             editLink.className = 'edit-link';
-            editLink.innerHTML = 'Edit';
+            editLink.innerHTML = '<i class="fas fa-pencil-alt"></i>';
             postCard.appendChild(editLink);
         }
 
@@ -363,14 +364,17 @@ const load_like = (post, postLikes, likePost, current_user) => {
 
 const display_likes = (post, postLikes, likePost, current_user) => {
     if (post.likes.includes(current_user.innerText)) {
-        likePost.innerHTML = "Unlike";
+        likePost.innerHTML = '<i class="fas fa-thumbs-up"></i>';
     } else {
-        likePost.innerHTML = "Like";
+        likePost.innerHTML = '<i class="far fa-thumbs-up"></i>';
     }
     console.log(post)
-    if (post.likes.length > 0) {
-        postLikes.style.display = 'block';
-        postLikes.innerHTML = post.likes.length;
+    postLikes.style.display = 'block';
+    if (post.likes.length > 1) {
+        postLikes.innerHTML = post.likes.length + " Likes";
+    }
+    else if (post.likes.length > 0) {
+        postLikes.innerHTML = post.likes.length + " Like";
     }
     else
         postLikes.style.display = 'none';
@@ -380,12 +384,12 @@ const display_edit = (post, postContent, postCard, editLink) => {
     const editTextArea = document.createElement("textarea");
     editTextArea.innerHTML = post.content
     postCard.replaceChild(editTextArea, postContent);
-    editLink.innerHTML = "Save";
+    editLink.innerHTML = '<i class="fas fa-save"></i>';
     editLink.onclick = () => {
         let newPostContent = { id: post.id, content: editTextArea.value };
         load_edit(newPostContent, post);
         postCard.replaceChild(postContent, editTextArea);
-        editLink.innerHTML = "Edit";
+        editLink.innerHTML = '<i class="fas fa-pencil-alt"></i>';
         postContent.innerHTML = newPostContent.content;
 
         // Update post cycle
