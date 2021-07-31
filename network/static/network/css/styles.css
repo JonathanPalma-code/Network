@@ -99,6 +99,7 @@ input[type=submit]:hover {
 #all-posts .post-card .post-user {
   grid-column: 1/2;
   font-weight: bold;
+  cursor: pointer;
 }
 #all-posts .post-card .post-content {
   grid-column: 1/3;
