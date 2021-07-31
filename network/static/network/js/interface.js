@@ -68,7 +68,7 @@ const load_profile = (user) => {
                     postData.push(post);
             })
             const current_page = 1;
-            const rows = 2;
+            const rows = 10;
 
             elementList = document.querySelector('#all-posts');
             display_list_posts(postData, elementList, rows, current_page);
@@ -131,7 +131,7 @@ const load_posts = (nav_bar) => {
 
                 // Specify the starting page and rows of posts per page
                 const current_page = 1;
-                const rows = 4;
+                const rows = 10;
 
                 display_list_posts(data, elementList, rows, current_page);
                 load_pagination(data, elementPage, rows, current_page);
