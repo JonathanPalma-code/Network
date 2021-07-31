@@ -1,0 +1,151 @@
+body {
+  padding: 2% 4% 2%;
+  display: grid;
+  grid-template-columns: 25% 75%;
+}
+body .index {
+  display: block !important;
+  font-size: x-large;
+  height: 90vh;
+}
+body .index ul {
+  display: block !important;
+}
+body .index ul li a {
+  color: #34457E !important;
+  cursor: pointer;
+}
+body .index ul li a:hover {
+  color: #4C69C5 !important;
+}
+
+.fas, .far {
+  color: #34457E;
+}
+
+input {
+  width: 50%;
+  height: 50px;
+  margin-top: 2%;
+  border-radius: 25px;
+  font-weight: 100;
+  transition: 0.2s;
+}
+input[type=submit] {
+  color: white;
+  background-color: #34457E;
+}
+input[type=submit]:hover {
+  color: white !important;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.login, .register {
+  height: 100%;
+  padding: 5%;
+  display: grid;
+  grid-template-columns: repeat(2, 50%);
+  align-items: center;
+}
+.login .introduction img, .register .introduction img {
+  display: flex;
+  align-items: center;
+}
+.login .login-user, .login .register-user, .register .login-user, .register .register-user {
+  padding-left: 10%;
+}
+.login .login-user h2, .login .register-user h2, .register .login-user h2, .register .register-user h2 {
+  font-weight: bolder;
+  padding: 2% 0 2%;
+}
+.login .login-user input, .login .register-user input, .register .login-user input, .register .register-user input {
+  width: 60%;
+  height: 50px;
+}
+.login .login-user .btn, .login .register-user .btn, .register .login-user .btn, .register .register-user .btn {
+  border-radius: 50px;
+}
+.login .login-user .error, .login .register-user .error, .register .login-user .error, .register .register-user .error {
+  color: red;
+  font-weight: bold;
+}
+.login .login-user p, .login .register-user p, .register .login-user p, .register .register-user p {
+  margin-top: 5%;
+}
+
+#add_post {
+  padding: 0 20% 0 20%;
+}
+
+#profile-page {
+  padding: 0 20% 0 20%;
+}
+
+#all-posts {
+  display: grid !important;
+  grid-template-columns: 20% 60% 20%;
+  padding: 5% 0 5%;
+}
+#all-posts .post-card {
+  grid-column: 2/3;
+  display: grid;
+  grid-template-columns: 50% 50%;
+  padding: 2%;
+  border: lightgray;
+  border-style: solid;
+  border-width: 0.1mm;
+}
+#all-posts .post-card .post-user {
+  grid-column: 1/2;
+  font-weight: bold;
+}
+#all-posts .post-card .post-content {
+  grid-column: 1/3;
+  grid-row: 3/4;
+  padding: 2% 0 2% 0;
+}
+#all-posts .post-card .post-date {
+  grid-column: 1/3;
+  grid-row: 2/3;
+  font-size: small;
+  font-style: italic;
+  color: gray;
+}
+#all-posts .post-card .post-likes {
+  grid-row: 4/5;
+  grid-column: 2/3;
+  text-align: end;
+  font-weight: 200;
+  font-size: small;
+}
+#all-posts .post-card .like {
+  grid-row: 4/5;
+  grid-column: 1/2;
+  border: none;
+  background: none;
+  width: fit-content;
+  padding: 0;
+  outline: none;
+}
+#all-posts .post-card .edit-link {
+  grid-column: 2/3;
+  grid-row: 1/2;
+  text-align: end;
+  cursor: pointer;
+}
+
+#pages {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  width: 100%;
+}
+#pages .pagination .page-item {
+  cursor: pointer;
+}
+#pages .pagination .page-item .page-link {
+  border-radius: 25px;
+}
+
+/*# sourceMappingURL=styles.css.map */

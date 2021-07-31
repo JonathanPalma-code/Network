@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.test import TransactionTestCase, Client
 from django.contrib.auth import authenticate
 from django.urls import reverse
@@ -31,6 +32,31 @@ class TestViews(TransactionTestCase):
             'confirmation': 'elfpass'
 
         }
+
+    # ! TEST LIKE / UNLIKE IN POST
+
+    def test_like_in_post(self):
+        self.client.post(self.register_url, self.user_data)
+        user = auth.get_user(self.client)
+
+        response = self.client.post('/add_post', {
+            'content': 'This is my first post',
+        }, content_type='application/json')
+
+        profile = Profile.objects.get(user=user)
+        post = Post.objects.get(original_poster=profile, content='This is my first post') 
+
+        response = self.client.put(f'/post/{post.id}', {
+            'likes': 'Gandalf'
+        }, content_type='application/json')
+
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.put(f'/post/{post.id}', {
+            'likes': ''
+        }, content_type='application/json')
+
+        self.assertEqual(response.status_code, 200)
 
     # ! TEST UPDATE POST
 
