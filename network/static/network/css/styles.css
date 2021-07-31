@@ -1,11 +1,12 @@
 body {
   padding: 2% 4% 2%;
   display: grid;
-  grid-template-columns: 20% 80%;
+  grid-template-columns: 25% 75%;
 }
 body .index {
   display: block !important;
   font-size: x-large;
+  height: 90vh;
 }
 body .index ul {
   display: block !important;
@@ -23,12 +24,21 @@ body .index ul li a:hover {
 }
 
 input {
-  background-color: #34457E;
-  color: white;
-  width: 100%;
+  width: 50%;
+  height: 50px;
   margin-top: 2%;
   border-radius: 25px;
   font-weight: 100;
+  transition: 0.2s;
+}
+input[type=submit] {
+  color: white;
+  background-color: #34457E;
+}
+input[type=submit]:hover {
+  color: white !important;
+  font-weight: 600;
+  transition: 0.2s;
 }
 
 .login, .register {
@@ -106,6 +116,8 @@ input {
   grid-row: 4/5;
   grid-column: 2/3;
   text-align: end;
+  font-weight: 200;
+  font-size: small;
 }
 #all-posts .post-card .like {
   grid-row: 4/5;
@@ -114,9 +126,7 @@ input {
   background: none;
   width: fit-content;
   padding: 0;
-}
-#all-posts .post-card .like:hover {
-  text-decoration: underline;
+  outline: none;
 }
 #all-posts .post-card .edit-link {
   grid-column: 2/3;
@@ -125,8 +135,17 @@ input {
   cursor: pointer;
 }
 
-.pagination {
-  justify-content: center;
+#pages {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  width: 100%;
+}
+#pages .pagination .page-item {
+  cursor: pointer;
+}
+#pages .pagination .page-item .page-link {
+  border-radius: 25px;
 }
 
 /*# sourceMappingURL=styles.css.map */

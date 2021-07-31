@@ -147,14 +147,14 @@ const load_pagination = (data, wrapper, rows_per_page, current_page) => {
     paginationNext.className = "page-item next";
     const linkNext = document.createElement("a");
     linkNext.className = "page-link";
-    linkNext.innerHTML = ">>";
+    linkNext.innerHTML = ">";
 
     const paginationPrevious = document.createElement("li");
     paginationPrevious.className = "page-item previous";
     paginationPrevious.style.display = "none";
     const linkPrevious = document.createElement("a");
     linkPrevious.className = "page-link";
-    linkPrevious.innerHTML = "<<";
+    linkPrevious.innerHTML = "<";
 
     listElement = document.querySelector('#all-posts');
 
@@ -317,7 +317,9 @@ const display_posts = (post) => {
         .then(data => {
                 postContent.innerHTML = data.content;
                 if (data.likes.length > 0)
-                    postLikes.innerHTML = data.likes.length;
+                    postLikes.innerHTML = data.likes.length + " Like";
+                if (data.likes.length > 1)
+                    postLikes.innerHTML = data.likes.length + " Likes";
                 if (data.likes.includes(current_user.innerText)) {
                     likePost.innerHTML = '<i class="fas fa-thumbs-up"></i>';
                 } else {

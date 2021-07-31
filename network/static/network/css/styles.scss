@@ -1,11 +1,12 @@
 body {
     padding: 2% 4% 2%;
     display: grid;
-    grid-template-columns: 20% 80%;
+    grid-template-columns: 25% 75%;
     
     .index {
         display: block !important;
         font-size: x-large;
+        height: 90vh;
         ul {
             display: block !important;  
             li {
@@ -26,12 +27,24 @@ body {
 }
 
 input {
-    background-color: #34457E;
-    color: white;
-    width: 100%;
+    width: 50%;
+    height: 50px;
     margin-top: 2%;
     border-radius: 25px;
     font-weight: 100;
+    transition: 0.2s;
+    
+    &[type=submit] {
+        color: white;
+        background-color: #34457E;
+        
+        &:hover {
+            color: white !important;
+            font-weight: 600;
+            transition: 0.2s;
+    }
+
+    }
 }
 
 .login, .register {
@@ -122,6 +135,8 @@ input {
             grid-row: 4 / 5;
             grid-column: 2 / 3;
             text-align: end;
+            font-weight: 200;
+            font-size: small;
         }
 
         .like {
@@ -131,10 +146,7 @@ input {
             background: none;
             width: fit-content;
             padding: 0;
-
-            &:hover {
-                text-decoration: underline;
-            }
+            outline: none;
         }
 
         .edit-link {
@@ -146,6 +158,20 @@ input {
     }
 }
 
-.pagination {
-    justify-content: center;
+#pages {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    width: 100%;
+
+    .pagination {
+
+        .page-item {
+            cursor: pointer;
+
+            .page-link {
+                border-radius: 25px;
+            }
+        }
+    }
 }
