@@ -39,12 +39,12 @@ const follower_user = (current_user, user) => {
     })
 
     setTimeout(() => {
-        load_profile(user)
+        load_follows(user)
     }, 500);
     return false
 }
 
-const load_profile = (user) => {
+const load_follows = (user) => {
 
     document.querySelector('#profile-page').style.display = 'block';
     document.querySelector('#all-posts').style.display = 'block';
@@ -57,6 +57,11 @@ const load_profile = (user) => {
             console.log(data);
             display_profile(data)
         })
+}
+
+const load_profile = (user) => {
+
+    load_follows(user);
 
     fetch(`/all_posts`)
         .then(response => response.json())
@@ -85,13 +90,14 @@ const display_profile = (data) => {
     current_user = document.getElementById('profile-link').innerText;
 
     if (data.user !== current_user) {
-        const followButton = document.createElement('button');
+        const followButton = document.createElement('input');
+        followButton.type = 'submit';
         followButton.className = 'btn-follow';
         if (data.follower.includes(current_user)) {
-            followButton.innerHTML = 'Unfollow';
+            followButton.value = 'Unfollow';
         }
         else {
-            followButton.innerHTML = 'Follow';
+            followButton.value = 'Follow';
         }
         followButton.onclick = () => follower_user(current_user, data.user);
         document.getElementById('profile-page').appendChild(followButton);
@@ -300,21 +306,21 @@ const display_posts = (post) => {
     postContent.id = post.id;
     postContent.className = 'post-content';
     postContent.innerHTML = post.content;
-    
+
     const postLikes = document.createElement('div');
     postLikes.className = 'post-likes';
-    
+
     // ! ADD LIKE OR UNLIKE AND LIMITATE LIKE TO 1
-    
+
     const likePost = document.createElement('button');
-    
+
     const editLink = document.createElement('a');
     if (current_user) {
         likePost.className = "like";
-        
+
         fetch(`/post/${post.id}`)
-        .then(response => response.json())
-        .then(data => {
+            .then(response => response.json())
+            .then(data => {
                 postContent.innerHTML = data.content;
                 if (data.likes.length > 0)
                     postLikes.innerHTML = data.likes.length + " Like";
@@ -330,7 +336,7 @@ const display_posts = (post) => {
                     load_like(data, postLikes, likePost, current_user);
                 }
                 editLink.onclick = () => display_edit(data, postContent, postCard, editLink);
-                
+
             })
     } else
         likePost.style.display = 'none';
